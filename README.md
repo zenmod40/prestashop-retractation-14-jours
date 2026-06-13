@@ -99,15 +99,24 @@ outils habituels et le client suit son retour dans son espace client comme d'hab
 
 ## 5. Installation
 
-1. Zipper le dossier `retractationcommande/` et l'installer via **Modules > Installer un module**
-   (ou copier dans `/modules/` puis installer).
+Récupérez le **ZIP prêt à installer**, au choix :
+
+- **Tout public** → [magicgarden.fr/retractation.php](https://magicgarden.fr/retractation.php) (version testée et tenue à jour).
+- **Développeurs** → la dernière [**Release GitHub**](https://github.com/NicoVmax/prestashop-retractation-14-jours/releases) (ZIP attaché à chaque version).
+
+Puis :
+
+1. Back-office PrestaShop → **Modules → Téléverser un module** → déposer le ZIP (ou décompresser dans `/modules/` puis installer).
 2. Configurer : email SAV, texte de la procédure de retour, exclusions éventuelles (IDs
-   produits/catégories au titre de L221-28 : sur mesure, périssables, hygiène descellée…).
+   produits/catégories au titre de L221-28 : sur mesure, périssables, hygiène descellée…),
+   puis copier la **clause CGV** générée dans vos conditions générales de vente.
 3. Recommandé : laisser **`PS_ORDER_RETURN` activé** (Service client > Retours produits)
    pour que le client suive ses retours dans « Mes retours de marchandise ».
 4. Vérifier que les **états de commande logistiques « Livré »** ont bien la case
    « Considérer l'état associé comme livré » cochée : c'est elle qui pose `delivery_date`,
    point de départ du décompte.
+
+> **Depuis les sources** (contributeurs) : clonez le dépôt et zippez le dossier `retractationcommande/` — c'est ce dossier, et lui seul, qui s'installe dans PrestaShop. Le ZIP des Releases est exactement ce dossier packagé.
 
 ## 6. Structure
 
@@ -124,20 +133,6 @@ retractationcommande/
 ├── views/ (js modal + css + templates front/hook/admin + PDF)
 └── mails/fr + mails/en (accusé, notif SAV, procédure, refus)
 ```
-
-## 7. Installation
-
-Récupérez le ZIP prêt à installer, au choix :
-
-- **Tout public** → [magicgarden.fr/retractation.php](https://magicgarden.fr/retractation.php) (version testée et tenue à jour).
-- **Développeurs** → la dernière [**Release GitHub**](https://github.com/NicoVmax/prestashop-retractation-14-jours/releases) (ZIP attaché à chaque version).
-
-Puis :
-
-1. Back-office PrestaShop → **Modules → Téléverser un module** → déposer le ZIP.
-2. Configurer le module (email SAV, délai, lien footer, exclusions L221-28) puis copier la **clause CGV** générée dans vos conditions générales de vente.
-
-> **Depuis les sources** (contributeurs) : clonez le dépôt et zippez le dossier `retractationcommande/` (c'est ce dossier, et lui seul, qui s'installe dans PrestaShop). Le ZIP des Releases est exactement ce dossier packagé.
 
 ## Auteur
 
