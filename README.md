@@ -127,11 +127,17 @@ retractationcommande/
 
 ## 7. Installation
 
-1. Télécharger le ZIP prêt à installer (version testée et tenue à jour) : **[magicgarden.fr](https://magicgarden.fr)**.
-2. Back-office PrestaShop → **Modules → Téléverser un module** → déposer le ZIP.
-3. Configurer le module (email SAV, délai, lien footer, exclusions L221-28) puis copier la **clause CGV** générée dans vos conditions générales de vente.
+Récupérez le ZIP prêt à installer, au choix :
 
-> Ce dépôt contient le **code source** (lecture, fork, contributions). Pour une installation clé en main, utilisez le ZIP officiel ci-dessus.
+- **Tout public** → [magicgarden.fr/retractation.php](https://magicgarden.fr/retractation.php) (version testée et tenue à jour).
+- **Développeurs** → la dernière [**Release GitHub**](https://github.com/NicoVmax/prestashop-retractation-14-jours/releases) (ZIP attaché à chaque version).
+
+Puis :
+
+1. Back-office PrestaShop → **Modules → Téléverser un module** → déposer le ZIP.
+2. Configurer le module (email SAV, délai, lien footer, exclusions L221-28) puis copier la **clause CGV** générée dans vos conditions générales de vente.
+
+> **Depuis les sources** (contributeurs) : clonez le dépôt et zippez le dossier `retractationcommande/` (c'est ce dossier, et lui seul, qui s'installe dans PrestaShop). Le ZIP des Releases est exactement ce dossier packagé.
 
 ## Auteur
 
