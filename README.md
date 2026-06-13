@@ -12,6 +12,16 @@ gratuite, visible et facilement accessible), applicables au **19 juin 2026**.
 - **Compatibilité PrestaShop 9** (déclaration de compatibilité étendue à 9.x)
 - Suppression des appels dépréciés : formatage des prix via `Locale::formatPrice()` (au lieu de `Tools::displayPrice`), date du formulaire générée côté PHP (plus de `strftime` déprécié en PHP 8.1)
 
+## Nouveautés v1.2 — multilingue (8 langues)
+
+- **Interface front traduite** (`translations/<iso>.php`, 116 chaînes par langue) : modal, page « Exercer mon droit », accusé PDF, page 2 « Rappel de vos droits », encart détail de commande, messages serveur. Clés MD5 PrestaShop générées par script depuis les chaînes réelles (clés exactes garanties).
+- **Emails traduits** (`mails/<iso>/`) : les 6 emails (accusé, notif SAV, procédure, refus, annulation, remboursée) en **HTML + texte**, logo et variables identiques au français.
+- **Clause CGV en 8 langues** dans `getCgvClause()` ; le panneau de config affiche une clause **par langue installée** dans la boutique (repli FR sinon).
+- **7 langues livrées** : FR (source) + EN, ES, DE, IT, NL, PT, PL.
+- **Format 100 % natif PrestaShop** : emails éditables via *International > Traductions > Traductions des e-mails*, interface via *Traductions des modules installés*.
+- **Sélection automatique** de la langue (commande/navigation du client) ; repli sur l'anglais (emails) ou le français (interface).
+- **Terminologie juridique adaptée** par langue (Widerruf, recesso, herroeping, desistimiento, livre resolução, odstąpienie) ; les références d'articles (L221-x) restent en français (droit français cité).
+
 ## Nouveautés v1.1
 
 - **Lien footer** « Exercer mon droit de rétractation » sur toutes les pages (libellé personnalisable, activable/désactivable)
