@@ -1,0 +1,12 @@
+Uw herroepingsverzoek
+
+Hallo {firstname} {lastname},
+
+Na controle kan uw herroepingsverzoek {request_ref} betreffende bestelling {order_ref} niet worden aanvaard om de volgende reden:
+
+{reason}
+
+Als u van mening bent dat deze beslissing aanvechtbaar is, kunt u op deze e-mail antwoorden of contact opnemen met onze klantenservice. U behoudt bovendien de mogelijkheid om een beroep te doen op een consumentenbemiddelaar.
+
+Met vriendelijke groet,
+{shop_name}

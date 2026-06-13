@@ -1,0 +1,10 @@
+Herroeping terugbetaald
+
+Hallo {firstname} {lastname},
+
+Uw herroeping {request_ref} betreffende bestelling {order_ref} is afgerond: {refund_intro} de terugbetaling is uitgevoerd via hetzelfde betaalmiddel als bij uw bestelling.
+
+Afhankelijk van uw bank kan het enkele dagen duren voordat de terugbetaling op uw rekening verschijnt.
+
+Bedankt voor uw vertrouwen,
+{shop_name}

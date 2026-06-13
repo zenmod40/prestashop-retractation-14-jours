@@ -1,0 +1,13 @@
+[SAV] Nouvelle demande de rétractation à vérifier
+
+Une nouvelle demande de rétractation ({request_ref}) vient d'être déposée.
+
+Commande : {order_ref} du {order_date}
+Client : {firstname} {lastname} ({email})
+Livrée le : {delivery_date}
+Date limite légale : {deadline}
+Motif client : {message}
+
+{sav_checklist}
+
+Traitez la demande dans le back-office : SAV > Rétractations.

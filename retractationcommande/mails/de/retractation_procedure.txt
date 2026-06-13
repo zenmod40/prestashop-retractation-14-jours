@@ -1,0 +1,10 @@
+Widerruf genehmigt — Rücksendeverfahren
+
+Hallo {firstname} {lastname},
+
+Ihr Widerrufsantrag {request_ref} zur Bestellung {order_ref} wurde geprüft und ist konform.
+
+{procedure}
+
+Mit freundlichen Grüßen,
+{shop_name}

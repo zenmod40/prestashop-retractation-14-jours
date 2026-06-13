@@ -1,0 +1,13 @@
+Rétractation remboursée
+
+Bonjour {firstname} {lastname},
+
+Votre rétractation {request_ref} concernant la commande {order_ref} est
+terminée : {refund_intro} le remboursement a été effectué par le même moyen
+de paiement que celui utilisé lors de votre commande.
+
+Selon votre banque, le remboursement peut mettre quelques jours à apparaître
+sur votre compte.
+
+Merci de votre confiance,
+{shop_name}

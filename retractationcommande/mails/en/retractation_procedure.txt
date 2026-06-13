@@ -1,0 +1,11 @@
+Withdrawal approved — Return procedure
+
+Hello {firstname} {lastname},
+
+Your withdrawal request {request_ref} regarding order {order_ref} has been
+checked and is compliant.
+
+{procedure}
+
+Best regards,
+{shop_name}

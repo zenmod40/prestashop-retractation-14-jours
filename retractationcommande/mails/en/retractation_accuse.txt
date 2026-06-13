@@ -1,0 +1,18 @@
+Acknowledgment of receipt — Withdrawal
+
+Hello {firstname} {lastname},
+
+In accordance with article L221-21 of the French Consumer Code, we acknowledge
+receipt of your withdrawal request {request_ref} regarding order {order_ref}
+placed on {order_date}.
+
+Order: {order_ref}
+Delivered on: {delivery_date}
+Legal deadline: {deadline}
+
+Your acknowledgment of receipt (PDF) is attached to this email. Please keep it.
+
+{next_steps}
+
+Best regards,
+{shop_name}

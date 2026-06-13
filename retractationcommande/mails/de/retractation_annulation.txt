@@ -1,0 +1,12 @@
+Widerruf genehmigt — Bestellung storniert
+
+Hallo {firstname} {lastname},
+
+Ihr Widerrufsantrag {request_ref} zur Bestellung {order_ref} wurde geprüft und ist konform.
+
+Da Ihre Bestellung noch nicht versandt wurde, ist keine Rücksendung erforderlich: Der Versand wird storniert.
+
+Die Rückerstattung des gesamten gezahlten Betrags erfolgt spätestens 14 Tage nach Ihrem Antrag über dasselbe Zahlungsmittel, das bei der Bestellung verwendet wurde (Art. L221-24 des französischen Verbrauchergesetzbuchs).
+
+Mit freundlichen Grüßen,
+{shop_name}

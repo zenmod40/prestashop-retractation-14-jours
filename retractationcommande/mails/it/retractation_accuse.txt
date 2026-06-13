@@ -1,0 +1,16 @@
+Conferma di ricezione — Recesso
+
+Salve {firstname} {lastname},
+
+Ai sensi dell'articolo L221-21 del Codice del consumo francese, confermiamo la ricezione della Sua richiesta di recesso {request_ref} relativa all'ordine {order_ref} del {order_date}.
+
+Ordine : {order_ref}
+Consegnato il : {delivery_date}
+Termine legale : {deadline}
+
+La Sua conferma di ricezione in formato PDF è allegata a questa e-mail. La conservi.
+
+{next_steps}
+
+Cordiali saluti,
+{shop_name}

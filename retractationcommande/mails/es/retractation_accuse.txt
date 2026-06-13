@@ -1,0 +1,16 @@
+Acuse de recibo — Desistimiento
+
+Hola {firstname} {lastname},
+
+De conformidad con el artículo L221-21 del Código de Consumo francés, acusamos recibo de su solicitud de desistimiento {request_ref} relativa al pedido {order_ref} del {order_date}.
+
+Pedido : {order_ref}
+Entregado el : {delivery_date}
+Plazo legal : {deadline}
+
+Su acuse de recibo en formato PDF se adjunta a este correo. Consérvelo.
+
+{next_steps}
+
+Atentamente,
+{shop_name}

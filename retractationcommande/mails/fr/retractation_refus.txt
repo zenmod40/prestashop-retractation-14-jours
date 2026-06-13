@@ -1,0 +1,15 @@
+Votre demande de rétractation
+
+Bonjour {firstname} {lastname},
+
+Après vérification, votre demande de rétractation {request_ref} concernant
+la commande {order_ref} ne peut pas être acceptée pour le motif suivant :
+
+{reason}
+
+Si vous estimez que cette décision est contestable, vous pouvez répondre à
+cet email ou contacter notre service client. Vous conservez par ailleurs la
+possibilité de recourir à un médiateur de la consommation.
+
+Cordialement,
+{shop_name}

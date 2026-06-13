@@ -1,0 +1,10 @@
+Desistimiento aprobado — Procedimiento de devolución
+
+Hola {firstname} {lastname},
+
+Su solicitud de desistimiento {request_ref} relativa al pedido {order_ref} ha sido verificada y es conforme.
+
+{procedure}
+
+Atentamente,
+{shop_name}

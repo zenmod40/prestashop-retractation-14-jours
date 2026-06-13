@@ -1,0 +1,16 @@
+Ontvangstbevestiging — Herroeping
+
+Hallo {firstname} {lastname},
+
+Overeenkomstig artikel L221-21 van het Franse consumentenwetboek bevestigen wij de ontvangst van uw herroepingsverzoek {request_ref} betreffende bestelling {order_ref} van {order_date}.
+
+Bestelling : {order_ref}
+Geleverd op : {delivery_date}
+Wettelijke termijn : {deadline}
+
+Uw ontvangstbevestiging in pdf-formaat is bij deze e-mail gevoegd. Bewaar deze.
+
+{next_steps}
+
+Met vriendelijke groet,
+{shop_name}

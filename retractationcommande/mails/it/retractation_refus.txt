@@ -1,0 +1,12 @@
+La Sua richiesta di recesso
+
+Salve {firstname} {lastname},
+
+Dopo la verifica, la Sua richiesta di recesso {request_ref} relativa all'ordine {order_ref} non può essere accettata per il seguente motivo:
+
+{reason}
+
+Se ritiene che questa decisione sia contestabile, può rispondere a questa e-mail o contattare il nostro servizio clienti. Conserva inoltre la possibilità di rivolgersi a un mediatore del consumo.
+
+Cordiali saluti,
+{shop_name}

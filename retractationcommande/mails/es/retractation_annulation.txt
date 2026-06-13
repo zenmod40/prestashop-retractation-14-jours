@@ -1,0 +1,12 @@
+Desistimiento aprobado — Pedido anulado
+
+Hola {firstname} {lastname},
+
+Su solicitud de desistimiento {request_ref} relativa al pedido {order_ref} ha sido verificada y es conforme.
+
+Dado que su pedido aún no había sido enviado, no es necesaria ninguna devolución de producto: el envío queda anulado.
+
+El reembolso de la totalidad de las cantidades abonadas se efectuará a más tardar 14 días después de su solicitud, mediante el mismo medio de pago utilizado en el pedido (art. L221-24 del Código de Consumo francés).
+
+Atentamente,
+{shop_name}

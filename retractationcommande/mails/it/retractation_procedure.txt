@@ -1,0 +1,10 @@
+Recesso approvato — Procedura di reso
+
+Salve {firstname} {lastname},
+
+La Sua richiesta di recesso {request_ref} relativa all'ordine {order_ref} è stata verificata ed è conforme.
+
+{procedure}
+
+Cordiali saluti,
+{shop_name}

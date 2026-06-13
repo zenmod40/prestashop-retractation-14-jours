@@ -1,0 +1,13 @@
+[Atención al cliente] Nueva solicitud de desistimiento a verificar
+
+Se ha presentado una nueva solicitud de desistimiento ({request_ref}).
+
+Pedido : {order_ref} — {order_date}
+Cliente : {firstname} {lastname} ({email})
+Entregado el : {delivery_date}
+Plazo legal : {deadline}
+Mensaje del cliente : {message}
+
+{sav_checklist}
+
+Tramite la solicitud en el back office: Atención al cliente &gt; Solicitudes de desistimiento.

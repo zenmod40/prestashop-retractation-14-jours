@@ -1,0 +1,14 @@
+Your withdrawal request
+
+Hello {firstname} {lastname},
+
+After review, your withdrawal request {request_ref} regarding order
+{order_ref} cannot be accepted for the following reason:
+
+{reason}
+
+If you wish to dispute this decision, you can reply to this email or contact
+our customer service. You may also refer the matter to a consumer mediator.
+
+Best regards,
+{shop_name}

@@ -1,0 +1,15 @@
+# Système
+.DS_Store
+Thumbs.db
+
+# Archives / builds (le ZIP est distribué via le site, pas via le dépôt)
+*.zip
+*.zip.old
+
+# Runtime du module (PDF générés en boutique)
+retractationcommande/pdf/
+
+# Éditeurs
+.idea/
+.vscode/
+*.swp

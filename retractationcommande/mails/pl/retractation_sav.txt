@@ -1,0 +1,13 @@
+[Obsługa klienta] Nowy wniosek o odstąpienie do sprawdzenia
+
+Złożono nowy wniosek o odstąpienie ({request_ref}).
+
+Zamówienie : {order_ref} — {order_date}
+Klient : {firstname} {lastname} ({email})
+Dostarczono dnia : {delivery_date}
+Termin ustawowy : {deadline}
+Wiadomość klienta : {message}
+
+{sav_checklist}
+
+Obsłuż wniosek w panelu administracyjnym: Obsługa klienta &gt; Wnioski o odstąpienie.

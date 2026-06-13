@@ -1,0 +1,12 @@
+Twój wniosek o odstąpienie
+
+Dzień dobry {firstname} {lastname},
+
+Po weryfikacji Twój wniosek o odstąpienie {request_ref} dotyczący zamówienia {order_ref} nie może zostać przyjęty z następującego powodu:
+
+{reason}
+
+Jeżeli uważasz, że decyzja ta jest podważalna, możesz odpowiedzieć na tę wiadomość lub skontaktować się z naszym działem obsługi klienta. Zachowujesz również możliwość skorzystania z mediatora konsumenckiego.
+
+Z poważaniem,
+{shop_name}

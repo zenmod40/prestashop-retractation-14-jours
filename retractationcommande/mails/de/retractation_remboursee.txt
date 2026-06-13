@@ -1,0 +1,10 @@
+Widerruf erstattet
+
+Hallo {firstname} {lastname},
+
+Ihr Widerruf {request_ref} zur Bestellung {order_ref} ist abgeschlossen: {refund_intro} die Rückerstattung erfolgte über dasselbe Zahlungsmittel, das bei Ihrer Bestellung verwendet wurde.
+
+Je nach Bank kann es einige Tage dauern, bis die Rückerstattung auf Ihrem Konto erscheint.
+
+Vielen Dank für Ihr Vertrauen,
+{shop_name}

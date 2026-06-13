@@ -1,0 +1,12 @@
+Ihr Widerrufsantrag
+
+Hallo {firstname} {lastname},
+
+Nach Prüfung kann Ihr Widerrufsantrag {request_ref} zur Bestellung {order_ref} aus folgendem Grund nicht angenommen werden:
+
+{reason}
+
+Wenn Sie diese Entscheidung für anfechtbar halten, können Sie auf diese E-Mail antworten oder sich an unseren Kundenservice wenden. Außerdem haben Sie die Möglichkeit, einen Verbraucherschlichter anzurufen.
+
+Mit freundlichen Grüßen,
+{shop_name}

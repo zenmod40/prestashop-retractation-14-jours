@@ -1,0 +1,16 @@
+Aviso de receção — Livre resolução
+
+Olá {firstname} {lastname},
+
+Nos termos do artigo L221-21 do Código do Consumo francês, acusamos a receção do seu pedido de livre resolução {request_ref} relativo à encomenda {order_ref} de {order_date}.
+
+Encomenda : {order_ref}
+Entregue em : {delivery_date}
+Prazo legal : {deadline}
+
+O seu aviso de receção em formato PDF segue em anexo a este e-mail. Conserve-o.
+
+{next_steps}
+
+Com os melhores cumprimentos,
+{shop_name}

@@ -1,0 +1,12 @@
+Su solicitud de desistimiento
+
+Hola {firstname} {lastname},
+
+Tras la verificación, su solicitud de desistimiento {request_ref} relativa al pedido {order_ref} no puede aceptarse por el siguiente motivo:
+
+{reason}
+
+Si considera que esta decisión es cuestionable, puede responder a este correo o ponerse en contacto con nuestro servicio de atención al cliente. Asimismo, conserva la posibilidad de recurrir a un mediador de consumo.
+
+Atentamente,
+{shop_name}

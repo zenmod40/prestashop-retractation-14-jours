@@ -1,0 +1,10 @@
+Odstąpienie zatwierdzone — Procedura zwrotu
+
+Dzień dobry {firstname} {lastname},
+
+Twój wniosek o odstąpienie {request_ref} dotyczący zamówienia {order_ref} został zweryfikowany i jest zgodny.
+
+{procedure}
+
+Z poważaniem,
+{shop_name}

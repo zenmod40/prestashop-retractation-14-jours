@@ -1,0 +1,12 @@
+Livre resolução aprovada — Encomenda anulada
+
+Olá {firstname} {lastname},
+
+O seu pedido de livre resolução {request_ref} relativo à encomenda {order_ref} foi verificado e está conforme.
+
+Uma vez que a sua encomenda ainda não tinha sido expedida, não é necessária qualquer devolução de produto: a expedição é anulada.
+
+O reembolso da totalidade das quantias pagas será efetuado no prazo máximo de 14 dias após o seu pedido, através do mesmo meio de pagamento utilizado na encomenda (art. L221-24 do Código do Consumo francês).
+
+Com os melhores cumprimentos,
+{shop_name}

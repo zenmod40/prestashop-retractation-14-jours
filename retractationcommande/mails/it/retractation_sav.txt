@@ -1,0 +1,13 @@
+[Servizio clienti] Nuova richiesta di recesso da verificare
+
+È stata presentata una nuova richiesta di recesso ({request_ref}).
+
+Ordine : {order_ref} — {order_date}
+Cliente : {firstname} {lastname} ({email})
+Consegnato il : {delivery_date}
+Termine legale : {deadline}
+Messaggio del cliente : {message}
+
+{sav_checklist}
+
+Gestisca la richiesta nel back office: Servizio clienti &gt; Richieste di recesso.

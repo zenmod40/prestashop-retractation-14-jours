@@ -1,0 +1,10 @@
+Desistimiento reembolsado
+
+Hola {firstname} {lastname},
+
+Su desistimiento {request_ref} relativo al pedido {order_ref} ha finalizado: {refund_intro} el reembolso se ha efectuado mediante el mismo medio de pago utilizado en su pedido.
+
+Según su banco, el reembolso puede tardar unos días en aparecer en su cuenta.
+
+Gracias por su confianza,
+{shop_name}

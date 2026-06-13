@@ -1,0 +1,11 @@
+Rétractation validée — Procédure de retour
+
+Bonjour {firstname} {lastname},
+
+Votre demande de rétractation {request_ref} concernant la commande
+{order_ref} a été vérifiée et est conforme.
+
+{procedure}
+
+Cordialement,
+{shop_name}

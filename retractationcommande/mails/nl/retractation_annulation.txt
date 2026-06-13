@@ -1,0 +1,12 @@
+Herroeping goedgekeurd — Bestelling geannuleerd
+
+Hallo {firstname} {lastname},
+
+Uw herroepingsverzoek {request_ref} betreffende bestelling {order_ref} is gecontroleerd en is conform.
+
+Aangezien uw bestelling nog niet was verzonden, is geen productretour nodig: de verzending wordt geannuleerd.
+
+De terugbetaling van het volledige betaalde bedrag vindt plaats uiterlijk 14 dagen na uw verzoek, via hetzelfde betaalmiddel als gebruikt bij de bestelling (art. L221-24 van het Franse consumentenwetboek).
+
+Met vriendelijke groet,
+{shop_name}

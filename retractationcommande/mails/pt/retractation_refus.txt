@@ -1,0 +1,12 @@
+O seu pedido de livre resolução
+
+Olá {firstname} {lastname},
+
+Após verificação, o seu pedido de livre resolução {request_ref} relativo à encomenda {order_ref} não pode ser aceite pelo seguinte motivo:
+
+{reason}
+
+Se considerar que esta decisão é contestável, pode responder a este e-mail ou contactar o nosso serviço de apoio ao cliente. Conserva ainda a possibilidade de recorrer a um mediador de consumo.
+
+Com os melhores cumprimentos,
+{shop_name}

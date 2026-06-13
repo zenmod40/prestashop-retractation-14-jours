@@ -1,0 +1,13 @@
+[Kundenservice] Neuer zu prüfender Widerrufsantrag
+
+Es wurde ein neuer Widerrufsantrag ({request_ref}) eingereicht.
+
+Bestellung : {order_ref} — {order_date}
+Kunde : {firstname} {lastname} ({email})
+Geliefert am : {delivery_date}
+Gesetzliche Frist : {deadline}
+Nachricht des Kunden : {message}
+
+{sav_checklist}
+
+Bearbeiten Sie den Antrag im Back-Office: Kundenservice &gt; Widerrufsanträge.

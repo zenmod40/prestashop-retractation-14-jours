@@ -1,0 +1,13 @@
+Withdrawal refunded
+
+Hello {firstname} {lastname},
+
+Your withdrawal {request_ref} regarding order {order_ref} is now complete:
+{refund_intro} the refund has been issued using the same means of payment
+as your order.
+
+Depending on your bank, the refund may take a few days to appear on your
+account.
+
+Thank you for your trust,
+{shop_name}

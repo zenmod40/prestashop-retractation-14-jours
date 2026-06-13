@@ -1,0 +1,13 @@
+[Customer service] New withdrawal request to check
+
+A new withdrawal request ({request_ref}) has just been submitted.
+
+Order: {order_ref} — {order_date}
+Customer: {firstname} {lastname} ({email})
+Delivered on: {delivery_date}
+Legal deadline: {deadline}
+Customer message: {message}
+
+{sav_checklist}
+
+Process the request in the back office: Customer Service > Withdrawal requests.

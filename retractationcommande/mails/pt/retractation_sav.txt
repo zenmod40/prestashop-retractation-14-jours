@@ -1,0 +1,13 @@
+[Apoio ao cliente] Novo pedido de livre resolução a verificar
+
+Foi apresentado um novo pedido de livre resolução ({request_ref}).
+
+Encomenda : {order_ref} — {order_date}
+Cliente : {firstname} {lastname} ({email})
+Entregue em : {delivery_date}
+Prazo legal : {deadline}
+Mensagem do cliente : {message}
+
+{sav_checklist}
+
+Trate o pedido no back office: Apoio ao cliente &gt; Pedidos de livre resolução.

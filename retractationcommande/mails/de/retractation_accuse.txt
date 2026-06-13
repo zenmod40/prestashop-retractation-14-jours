@@ -1,0 +1,16 @@
+Empfangsbestätigung — Widerruf
+
+Hallo {firstname} {lastname},
+
+Gemäß Artikel L221-21 des französischen Verbrauchergesetzbuchs bestätigen wir den Eingang Ihres Widerrufsantrags {request_ref} zur Bestellung {order_ref} vom {order_date}.
+
+Bestellung : {order_ref}
+Geliefert am : {delivery_date}
+Gesetzliche Frist : {deadline}
+
+Ihre Empfangsbestätigung im PDF-Format ist dieser E-Mail beigefügt. Bitte bewahren Sie sie auf.
+
+{next_steps}
+
+Mit freundlichen Grüßen,
+{shop_name}

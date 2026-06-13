@@ -1,0 +1,12 @@
+Odstąpienie zatwierdzone — Zamówienie anulowane
+
+Dzień dobry {firstname} {lastname},
+
+Twój wniosek o odstąpienie {request_ref} dotyczący zamówienia {order_ref} został zweryfikowany i jest zgodny.
+
+Ponieważ Twoje zamówienie nie zostało jeszcze wysłane, zwrot produktu nie jest konieczny: wysyłka zostaje anulowana.
+
+Zwrot całości wpłaconych kwot zostanie dokonany najpóźniej w ciągu 14 dni od Twojego wniosku tym samym sposobem płatności, który został użyty przy zamówieniu (art. L221-24 francuskiego Kodeksu konsumenckiego).
+
+Z poważaniem,
+{shop_name}

@@ -1,0 +1,10 @@
+Recesso rimborsato
+
+Salve {firstname} {lastname},
+
+Il Suo recesso {request_ref} relativo all'ordine {order_ref} è concluso: {refund_intro} il rimborso è stato effettuato con lo stesso mezzo di pagamento utilizzato per il Suo ordine.
+
+A seconda della Sua banca, il rimborso può richiedere alcuni giorni prima di apparire sul Suo conto.
+
+Grazie per la fiducia,
+{shop_name}

@@ -1,0 +1,16 @@
+Rétractation validée — Commande annulée
+
+Bonjour {firstname} {lastname},
+
+Votre demande de rétractation {request_ref} concernant la commande
+{order_ref} a été vérifiée et est conforme.
+
+Votre commande n'ayant pas encore été expédiée, aucun retour de produit
+n'est nécessaire : l'expédition est annulée.
+
+Le remboursement de la totalité des sommes versées interviendra au plus
+tard 14 jours après votre demande, par le même moyen de paiement que celui
+utilisé lors de la commande (art. L221-24 du Code de la consommation).
+
+Cordialement,
+{shop_name}

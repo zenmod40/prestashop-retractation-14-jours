@@ -1,0 +1,37 @@
+<html>
+<body style="font-family: Arial, Helvetica, sans-serif; color: #333; font-size: 14px; line-height: 1.5;">
+<table width="600" align="center" cellpadding="0" cellspacing="0" style="border: 1px solid #e0e0e0;">
+  <tr>
+    <td style="padding: 16px 20px; text-align: center; background: #ffffff; border-bottom: 1px solid #eee;">
+      <img src="{shop_logo}" alt="{shop_name}" style="max-height: 60px;">
+    </td>
+  </tr>
+  <tr>
+    <td style="background: #2e7d32; color: #fff; padding: 14px 20px; font-size: 18px; font-weight: bold;">
+      Accusé de réception — Rétractation
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 20px;">
+      <p>Bonjour {firstname} {lastname},</p>
+      <p>
+        Conformément à l'article L221-21 du Code de la consommation, nous accusons réception de votre
+        demande de rétractation <strong>{request_ref}</strong> concernant la commande
+        <strong>{order_ref}</strong> du {order_date}.
+      </p>
+      <table cellpadding="6" style="border-collapse: collapse; width: 100%; font-size: 13px;">
+        <tr><td style="border: 1px solid #e0e0e0;"><strong>Commande</strong></td><td style="border: 1px solid #e0e0e0;">{order_ref}</td></tr>
+        <tr><td style="border: 1px solid #e0e0e0;"><strong>Livrée le</strong></td><td style="border: 1px solid #e0e0e0;">{delivery_date}</td></tr>
+        <tr><td style="border: 1px solid #e0e0e0;"><strong>Date limite légale</strong></td><td style="border: 1px solid #e0e0e0;">{deadline}</td></tr>
+        <tr><td style="border: 1px solid #e0e0e0;"><strong>Produits</strong></td><td style="border: 1px solid #e0e0e0;">{products}</td></tr>
+      </table>
+      <p>
+        Votre accusé de réception au format PDF est joint à cet email. Conservez-le.
+      </p>
+      <p>{next_steps}</p>
+      <p>Cordialement,<br>{shop_name}</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Livre resolução aprovada — Procedimento de devolução
+
+Olá {firstname} {lastname},
+
+O seu pedido de livre resolução {request_ref} relativo à encomenda {order_ref} foi verificado e está conforme.
+
+{procedure}
+
+Com os melhores cumprimentos,
+{shop_name}

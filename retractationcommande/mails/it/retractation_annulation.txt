@@ -1,0 +1,12 @@
+Recesso approvato — Ordine annullato
+
+Salve {firstname} {lastname},
+
+La Sua richiesta di recesso {request_ref} relativa all'ordine {order_ref} è stata verificata ed è conforme.
+
+Poiché il Suo ordine non era ancora stato spedito, non è necessaria alcuna restituzione di prodotto: la spedizione è annullata.
+
+Il rimborso dell'intero importo versato sarà effettuato entro 14 giorni dalla Sua richiesta, con lo stesso mezzo di pagamento utilizzato per l'ordine (art. L221-24 del Codice del consumo francese).
+
+Cordiali saluti,
+{shop_name}

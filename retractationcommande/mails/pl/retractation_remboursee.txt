@@ -1,0 +1,10 @@
+Odstąpienie — zwrot środków
+
+Dzień dobry {firstname} {lastname},
+
+Twoje odstąpienie {request_ref} dotyczące zamówienia {order_ref} zostało zakończone: {refund_intro} zwrot został dokonany tym samym sposobem płatności, który został użyty przy zamówieniu.
+
+W zależności od Twojego banku zwrot może pojawić się na koncie po kilku dniach.
+
+Dziękujemy za zaufanie,
+{shop_name}

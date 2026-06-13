@@ -1,0 +1,13 @@
+[Klantenservice] Nieuw te controleren herroepingsverzoek
+
+Er is een nieuw herroepingsverzoek ({request_ref}) ingediend.
+
+Bestelling : {order_ref} — {order_date}
+Klant : {firstname} {lastname} ({email})
+Geleverd op : {delivery_date}
+Wettelijke termijn : {deadline}
+Bericht van de klant : {message}
+
+{sav_checklist}
+
+Behandel het verzoek in de back office: Klantenservice &gt; Herroepingsverzoeken.

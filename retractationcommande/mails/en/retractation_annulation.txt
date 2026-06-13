@@ -1,0 +1,16 @@
+Withdrawal approved — Order cancelled
+
+Hello {firstname} {lastname},
+
+Your withdrawal request {request_ref} regarding order {order_ref} has been
+checked and is compliant.
+
+As your order had not been shipped yet, no product return is needed: the
+shipment is cancelled.
+
+The refund of all sums paid will be issued no later than 14 days after your
+request, using the same means of payment as your order (article L221-24 of
+the French Consumer Code).
+
+Best regards,
+{shop_name}

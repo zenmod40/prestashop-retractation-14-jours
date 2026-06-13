@@ -1,0 +1,18 @@
+Accusé de réception — Rétractation
+
+Bonjour {firstname} {lastname},
+
+Conformément à l'article L221-21 du Code de la consommation, nous accusons
+réception de votre demande de rétractation {request_ref} concernant la
+commande {order_ref} du {order_date}.
+
+Commande : {order_ref}
+Livrée le : {delivery_date}
+Date limite légale : {deadline}
+
+Votre accusé de réception au format PDF est joint à cet email. Conservez-le.
+
+{next_steps}
+
+Cordialement,
+{shop_name}

@@ -1,0 +1,289 @@
+/* Rétractation Commande — front */
+
+/* Liens d'action compacts sur la page Mes commandes */
+.page-customer-account #content .order-actions a {
+  padding: 0.125rem 0.5rem;
+}
+
+/* ---------- Bouton "Se rétracter" : visible, forme de bouton ---------- */
+.retractation-btn {
+  display: inline-block;
+  background: #2e7d32;
+  color: #fff !important;
+  border: 0;
+  border-radius: 4px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.retractation-btn:hover,
+.retractation-btn:focus {
+  background: #1b5e20;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+/* ---------- Badge de statut sur la ligne de commande ---------- */
+.retractation-status-badge {
+  display: inline-block;
+  background: #fff3e0;
+  color: #a05a14;
+  border: 1px solid #f0c27f;
+  border-radius: 12px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: normal;
+}
+
+.retractation-cell {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.retractation-inline-actions {
+  margin-top: 0.4rem;
+}
+
+.retractation-deadline-hint {
+  font-size: 0.75rem;
+  color: #2e7d32;
+  margin-top: 0.2rem;
+}
+
+/* ---------- Modal ---------- */
+.retractation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 2rem 1rem;
+}
+
+.retractation-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  max-width: 760px;
+  width: 100%;
+  padding: 1.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  margin: auto 0;
+}
+
+body.retractation-modal-open {
+  overflow: hidden;
+}
+
+.retractation-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  border: 0;
+  background: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #555;
+}
+
+.retractation-modal h3 {
+  margin-bottom: 0.5rem;
+}
+
+.retractation-deadline {
+  font-size: 0.9rem;
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.retractation-formulaire-type {
+  background: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.retractation-formulaire-type table {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.retractation-formulaire-type td {
+  padding: 0.15rem 0.5rem 0.15rem 0;
+  vertical-align: top;
+}
+
+.retractation-formulaire-type td:first-child {
+  font-weight: 600;
+  width: 40%;
+}
+
+/* ---------- Sélection produits / quantités ---------- */
+.retractation-products-title {
+  font-size: 0.95rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.retractation-products-table {
+  width: 100%;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+  border-collapse: collapse;
+}
+
+.retractation-products-table th,
+.retractation-products-table td {
+  border: 1px solid #e4e8e4;
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.retractation-products-table th {
+  background: #eef5ee;
+  color: #2e5a31;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.retractation-products-table tbody tr:nth-child(even) td {
+  background: #fafbfa;
+}
+
+.retractation-qty-col {
+  width: 150px;
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+.retractation-qty {
+  display: inline-block;
+  width: auto;
+  min-width: 120px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #cfd8cf;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.retractation-qty:focus {
+  border-color: #2e7d32;
+  outline: none;
+}
+
+.retractation-qty-max {
+  font-size: 0.78rem;
+  color: #999;
+  margin-left: 0.3rem;
+}
+
+.retractation-qty-fixed {
+  display: inline-block;
+  min-width: 2rem;
+  font-weight: 700;
+  color: #2e5a31;
+}
+
+.retractation-form [type="submit"]:disabled,
+.retractation-form [type="submit"].disabled {
+  opacity: 0.65;
+  filter: saturate(0.6);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------- Formulaire / actions ---------- */
+.retractation-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.retractation-form textarea {
+  width: 100%;
+  min-height: 70px;
+}
+
+.retractation-legal {
+  font-size: 0.78rem;
+  color: #777;
+  margin-top: 1rem;
+}
+
+.retractation-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.retractation-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #555;
+}
+
+.retractation-success h3 {
+  color: #2e7d32;
+}
+
+.retractation-pdf-link {
+  margin-top: 1rem;
+}
+
+/* ---------- Encart détail de commande ---------- */
+.retractation-orderdetail-box {
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #2e7d32;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  background: #fff;
+}
+
+.retractation-orderdetail-box .retractation-status {
+  font-weight: 600;
+}
+
+/* ---------- Lien footer ---------- */
+.retractation-footer-link {
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.retractation-footer-link a {
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+/* ---------- Page formulaire ---------- */
+.retractation-page .retractation-orders-table td {
+  vertical-align: middle;
+}
+
+.retractation-guest-result {
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #2e7d32;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+  background: #fafdfb;
+}

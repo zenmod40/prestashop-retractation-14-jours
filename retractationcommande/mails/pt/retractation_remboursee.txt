@@ -1,0 +1,10 @@
+Livre resolução reembolsada
+
+Olá {firstname} {lastname},
+
+A sua livre resolução {request_ref} relativa à encomenda {order_ref} está concluída: {refund_intro} o reembolso foi efetuado através do mesmo meio de pagamento utilizado na sua encomenda.
+
+Consoante o seu banco, o reembolso pode demorar alguns dias a aparecer na sua conta.
+
+Obrigado pela sua confiança,
+{shop_name}

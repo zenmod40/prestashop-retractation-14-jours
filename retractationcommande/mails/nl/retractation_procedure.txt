@@ -1,0 +1,10 @@
+Herroeping goedgekeurd — Retourprocedure
+
+Hallo {firstname} {lastname},
+
+Uw herroepingsverzoek {request_ref} betreffende bestelling {order_ref} is gecontroleerd en is conform.
+
+{procedure}
+
+Met vriendelijke groet,
+{shop_name}

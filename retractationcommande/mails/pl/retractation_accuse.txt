@@ -1,0 +1,16 @@
+Potwierdzenie odbioru — Odstąpienie
+
+Dzień dobry {firstname} {lastname},
+
+Zgodnie z artykułem L221-21 francuskiego Kodeksu konsumenckiego potwierdzamy odbiór Twojego wniosku o odstąpienie {request_ref} dotyczącego zamówienia {order_ref} z dnia {order_date}.
+
+Zamówienie : {order_ref}
+Dostarczono dnia : {delivery_date}
+Termin ustawowy : {deadline}
+
+Twoje potwierdzenie odbioru w formacie PDF jest załączone do tej wiadomości. Zachowaj je.
+
+{next_steps}
+
+Z poważaniem,
+{shop_name}

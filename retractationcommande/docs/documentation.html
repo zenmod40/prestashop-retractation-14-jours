@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rétractation Commande — Documentation du module PrestaShop 8</title>
+<style>
+  :root {
+    --vert: #2e7d32;
+    --vert-clair: #e8f5e9;
+    --rouge: #c0392b;
+    --rouge-clair: #fdecea;
+    --orange: #e67e22;
+    --orange-clair: #fdf3e7;
+    --bleu: #1565c0;
+    --bleu-clair: #e3f2fd;
+    --gris: #f5f6f7;
+    --bordure: #e0e3e6;
+    --texte: #2c3338;
+    --texte-doux: #5f6b76;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    color: var(--texte);
+    line-height: 1.65;
+    background: var(--gris);
+    font-size: 15px;
+  }
+  /* ---------- En-tête ---------- */
+  header {
+    background: linear-gradient(135deg, #1b5e20 0%, var(--vert) 60%, #43a047 100%);
+    color: #fff;
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 8px; font-size: 30px; font-weight: 700; letter-spacing: 0.3px; }
+  header p.sous-titre { margin: 0 auto; max-width: 720px; font-size: 16px; opacity: 0.92; }
+  header .meta {
+    display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-top: 18px;
+  }
+  header .meta span {
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+  }
+  /* ---------- Sommaire ---------- */
+  nav.sommaire {
+    background: #fff;
+    border-bottom: 1px solid var(--bordure);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  nav.sommaire a {
+    display: inline-block;
+    color: var(--texte-doux);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 16px;
+  }
+  nav.sommaire a:hover { color: var(--vert); background: var(--vert-clair); }
+  /* ---------- Corps ---------- */
+  main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  section {
+    background: #fff;
+    border: 1px solid var(--bordure);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    scroll-margin-top: 70px;
+  }
+  h2 {
+    margin: 0 0 18px;
+    font-size: 21px;
+    color: var(--vert);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--vert-clair);
+  }
+  h2 .num {
+    display: inline-block;
+    background: var(--vert);
+    color: #fff;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    font-size: 15px;
+    margin-right: 10px;
+  }
+  h3 { font-size: 16.5px; margin: 24px 0 8px; color: var(--texte); }
+  p { margin: 8px 0 14px; }
+  ul, ol { margin: 8px 0 16px; padding-left: 24px; }
+  li { margin-bottom: 5px; }
+  code {
+    background: var(--gris);
+    border: 1px solid var(--bordure);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: #b03060;
+  }
+  pre {
+    background: #263238;
+    color: #eceff1;
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; color: inherit; padding: 0; }
+  /* ---------- Tableaux ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--vert-clair);
+    color: #1b5e20;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--bordure);
+    font-weight: 700;
+  }
+  td { padding: 9px 14px; border: 1px solid var(--bordure); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  /* ---------- Encarts ---------- */
+  .encart {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-left: 4px solid;
+    font-size: 14px;
+  }
+  .encart strong:first-child { display: block; margin-bottom: 4px; }
+  .encart.info    { background: var(--bleu-clair);   border-color: var(--bleu); }
+  .encart.succes  { background: var(--vert-clair);   border-color: var(--vert); }
+  .encart.alerte  { background: var(--orange-clair); border-color: var(--orange); }
+  .encart.danger  { background: var(--rouge-clair);  border-color: var(--rouge); }
+  /* ---------- Badges ---------- */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge.vert   { background: var(--vert-clair);   color: #1b5e20; }
+  .badge.orange { background: var(--orange-clair); color: #a05a14; }
+  .badge.rouge  { background: var(--rouge-clair);  color: #922b21; }
+  .badge.bleu   { background: var(--bleu-clair);   color: #0d47a1; }
+  /* ---------- Étapes du parcours ---------- */
+  .etapes { counter-reset: etape; margin: 20px 0; padding: 0; list-style: none; }
+  .etapes li {
+    position: relative;
+    padding: 0 0 22px 56px;
+    margin: 0;
+  }
+  .etapes li::before {
+    counter-increment: etape;
+    content: counter(etape);
+    position: absolute;
+    left: 0; top: 0;
+    width: 36px; height: 36px;
+    background: var(--vert);
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 36px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .etapes li::after {
+    content: "";
+    position: absolute;
+    left: 17px; top: 40px; bottom: 2px;
+    width: 2px;
+    background: var(--vert-clair);
+  }
+  .etapes li:last-child::after { display: none; }
+  .etapes li strong.titre { display: block; font-size: 15.5px; margin-bottom: 2px; }
+  .etapes li p { margin: 2px 0 0; color: var(--texte-doux); font-size: 14px; }
+  /* ---------- Schéma délai ---------- */
+  .frise {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 18px 0 6px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--bordure);
+    font-size: 12.5px;
+    text-align: center;
+  }
+  .frise > div { padding: 12px 10px; flex: 1; }
+  .frise .jour-l   { background: var(--bleu-clair); }
+  .frise .decompte { background: var(--vert-clair); flex: 3; }
+  .frise .report   { background: var(--orange-clair); }
+  .frise strong { display: block; font-size: 13px; margin-bottom: 2px; }
+  .legende { font-size: 12.5px; color: var(--texte-doux); margin-bottom: 16px; }
+  /* ---------- Pied ---------- */
+  footer {
+    text-align: center;
+    color: var(--texte-doux);
+    font-size: 13px;
+    padding: 24px;
+  }
+  @media (max-width: 640px) {
+    section { padding: 20px 18px; }
+    .frise { flex-direction: column; }
+  }
+  @media print {
+    nav.sommaire { display: none; }
+    header { background: var(--vert); }
+    section { border: none; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Rétractation Commande</h1>
+  <p class="sous-titre">
+    Module PrestaShop 8 — Droit de rétractation légal de 14 jours
+    (art. L221-18 s. du Code de la consommation · ordonnance n°2026-2 et décret n°2026-3 :
+    fonctionnalité de rétractation en ligne obligatoire au 19 juin 2026)
+  </p>
+  <div class="meta">
+    <span>Version 1.1.0</span>
+    <span>PrestaShop 1.7.6 → 8.x</span>
+    <span>Conformité requise au 19 juin 2026</span>
+    <span>Magic Garden</span>
+  </div>
+</header>
+
+<nav class="sommaire">
+  <a href="#presentation">Présentation</a>
+  <a href="#loi">Cadre légal</a>
+  <a href="#delai">Calcul du délai</a>
+  <a href="#client">Parcours client</a>
+  <a href="#sav">Workflow SAV</a>
+  <a href="#installation">Installation</a>
+  <a href="#configuration">Configuration</a>
+  <a href="#technique">Technique</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<main>
+
+  <!-- ================================================================ -->
+  <section id="presentation">
+    <h2><span class="num">1</span>Présentation</h2>
+    <p>
+      Le module <strong>Rétractation Commande</strong> met la boutique en conformité avec le droit
+      de rétractation du consommateur pour les ventes à distance
+      (<a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F10485" target="_blank" rel="noopener">fiche officielle service-public.gouv.fr — F10485</a>).
+    </p>
+    <p>
+      L'<strong>ordonnance n°2026-2</strong> et le <strong>décret n°2026-3</strong> imposent, à compter du
+      <strong>19 juin 2026</strong>, une fonctionnalité <em>gratuite, visible et facilement accessible</em>
+      permettant d'exercer le droit de rétractation directement depuis le site
+      (amende administrative jusqu'à <strong>75 000 €</strong> pour une société en cas de non-conformité).
+    </p>
+    <p>Le module installe : un <strong>lien en pied de page de toutes les pages</strong> (libellé
+      personnalisable, activable/désactivable), un bouton <strong>« Se rétracter »</strong> dans l'espace
+      client visible <strong>uniquement pendant la fenêtre légale</strong>, un <strong>parcours invité</strong>
+      (email + référence de commande), un <strong>formulaire type prérempli</strong> en modal avec
+      <strong>sélection des produits et quantités</strong> (rétractation partielle permise par la loi),
+      un <strong>accusé de réception PDF</strong> (logo, prix, totaux, montant à rembourser) envoyé par email,
+      une <strong>référence non séquentielle type RMA</strong> (RET-XXXXXXXX — le volume de rétractations
+      n'est pas déductible), et une <strong>file de vérification SAV</strong> avant envoi de la procédure
+      de retour et remboursement. Une <strong>clause CGV bilingue prête à copier</strong> est fournie dans
+      la configuration. Toutes les chaînes front, le PDF et les emails (FR/EN) sont
+      <strong>multilingues</strong> (BO &gt; Traductions).</p>
+
+    <div class="encart succes">
+      <strong>Philosophie : s'appuyer sur le natif, pas le remplacer.</strong>
+      Chaque rétractation confirmée crée un <em>retour produit natif</em> PrestaShop
+      (SAV &gt; Retours produits). Le SAV conserve ses outils habituels et le client suit son
+      retour dans « Mes retours de marchandise » comme pour n'importe quel retour.
+    </div>
+
+    <h3>Ce que le natif PrestaShop ne couvre pas (et que le module apporte)</h3>
+    <table>
+      <tr><th>Exigence légale</th><th>Natif PS8</th><th>Module</th></tr>
+      <tr>
+        <td>Décompte démarrant <strong>le lendemain</strong> de la livraison</td>
+        <td><span class="badge rouge">Non</span> (jour de livraison)</td>
+        <td><span class="badge vert">Oui</span></td>
+      </tr>
+      <tr>
+        <td>Prolongation au <strong>1<sup>er</sup> jour ouvrable</strong> si échéance un samedi, dimanche ou jour férié</td>
+        <td><span class="badge rouge">Non</span></td>
+        <td><span class="badge vert">Oui</span> (jours fériés français calculés)</td>
+      </tr>
+      <tr>
+        <td>Formulaire type de rétractation (annexe art. R221-1)</td>
+        <td><span class="badge rouge">Non</span></td>
+        <td><span class="badge vert">Oui</span> (modal préremplie)</td>
+      </tr>
+      <tr>
+        <td>Accusé de réception en cas de dépôt via le site (art. L221-21 al. 3)</td>
+        <td><span class="badge rouge">Non</span></td>
+        <td><span class="badge vert">Oui</span> (PDF + email immédiats)</td>
+      </tr>
+      <tr>
+        <td>Rétractation possible <strong>avant la livraison</strong> (dès la conclusion du contrat)</td>
+        <td><span class="badge rouge">Non</span></td>
+        <td><span class="badge vert">Oui</span> (option activable)</td>
+      </tr>
+      <tr>
+        <td>Bouton dans la liste « Mes commandes »</td>
+        <td><span class="badge rouge">Non</span> (détail de commande uniquement)</td>
+        <td><span class="badge vert">Oui</span></td>
+      </tr>
+      <tr>
+        <td>Lien visible sur toutes les pages + parcours invité (ordonnance n°2026-2)</td>
+        <td><span class="badge rouge">Non</span></td>
+        <td><span class="badge vert">Oui</span> (footer + page dédiée, email + référence pour les invités)</td>
+      </tr>
+      <tr>
+        <td>Accusé chiffré : prix, totaux, montant à rembourser (livraison incluse si rétractation totale)</td>
+        <td><span class="badge rouge">Non</span></td>
+        <td><span class="badge vert">Oui</span> (PDF + estimation au prorata si partielle)</td>
+      </tr>
+    </table>
+
+    <h3>Cohabitation avec le système natif</h3>
+    <p>
+      Le module ne remplace pas les retours natifs, il les <strong>pilote</strong> : chaque rétractation
+      confirmée crée un retour dans <em>SAV &gt; Retours produits</em> et chaque décision SAV (conforme /
+      refusée / remboursée) synchronise l'état du retour natif. Pour éviter un double point d'entrée,
+      l'option <em>« Masquer le formulaire de retour natif »</em> (activée par défaut) retire le formulaire
+      de retour historique du détail de commande : la rétractation passe uniquement par le parcours légal
+      du module, tandis que le suivi « Mes retours de marchandise » reste fonctionnel pour le client.
+    </p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="loi">
+    <h2><span class="num">2</span>Cadre légal appliqué</h2>
+    <table>
+      <tr><th style="width:32%">Règle</th><th>Référence</th><th>Application dans le module</th></tr>
+      <tr>
+        <td><strong>14 jours calendaires</strong> pour se rétracter, sans avoir à motiver sa décision</td>
+        <td>L221-18</td>
+        <td>Fenêtre d'affichage du bouton ; champ « motif » explicitement <em>facultatif</em></td>
+      </tr>
+      <tr>
+        <td>Décompte à partir du <strong>lendemain</strong> de la livraison du bien (de la conclusion du contrat pour un service)</td>
+        <td>L221-18</td>
+        <td>Calcul automatique à partir de la date de livraison de la commande</td>
+      </tr>
+      <tr>
+        <td>Échéance un <strong>samedi, dimanche ou jour férié</strong> → prolongation jusqu'au premier jour ouvrable suivant</td>
+        <td>L221-18</td>
+        <td>Report automatique (11 jours fériés français, fêtes mobiles incluses)</td>
+      </tr>
+      <tr>
+        <td>Droit exerçable <strong>dès la conclusion du contrat</strong>, avant même la livraison</td>
+        <td>L221-18</td>
+        <td>Bouton visible sur les commandes non livrées (désactivable)</td>
+      </tr>
+      <tr>
+        <td><strong>Formulaire type</strong> de rétractation ou toute déclaration dénuée d'ambiguïté</td>
+        <td>R221-1 (annexe)</td>
+        <td>Modal reprenant les mentions du formulaire type, préremplie</td>
+      </tr>
+      <tr>
+        <td><strong>Accusé de réception</strong> obligatoire quand la rétractation est déposée via le site du vendeur</td>
+        <td>L221-21 al. 3</td>
+        <td>PDF généré et envoyé par email immédiatement, archivé côté BO</td>
+      </tr>
+      <tr>
+        <td><strong>Exclusions</strong> : sur mesure/personnalisé, périssable, descellé pour hygiène, contenu numérique, etc.</td>
+        <td>L221-28</td>
+        <td>Produits/catégories exclus configurables + alerte SAV ; vérification humaine</td>
+      </tr>
+      <tr>
+        <td><strong>Remboursement intégral</strong> (livraison standard incluse) sous 14 jours après récupération du bien ou preuve d'expédition, même moyen de paiement</td>
+        <td>L221-24</td>
+        <td>Rappelé dans l'accusé, les emails et l'écran SAV ; remboursement réel via la fiche commande</td>
+      </tr>
+      <tr>
+        <td><strong>Frais de renvoi</strong> à la charge du consommateur s'il en a été informé</td>
+        <td>L221-23</td>
+        <td>Mention dans la modal, l'accusé PDF et l'email de procédure</td>
+      </tr>
+    </table>
+    <div class="encart alerte">
+      <strong>Rappel important.</strong>
+      Si le consommateur n'est pas informé de son droit de rétractation, le délai est prolongé
+      de <strong>12 mois</strong>. Vérifiez que vos CGV et votre processus de commande mentionnent
+      bien ce droit, le formulaire type et les frais de renvoi : le module gère la mécanique de la
+      demande, pas le contenu de vos CGV.
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="delai">
+    <h2><span class="num">3</span>Calcul du délai légal</h2>
+    <p>Le calcul est effectué par la classe <code>RetractationDelai</code> :</p>
+
+    <div class="frise">
+      <div class="jour-l"><strong>Jour J</strong>Livraison du bien<br>(<code>delivery_date</code>)</div>
+      <div class="decompte"><strong>J+1 → J+14</strong>Décompte des 14 jours calendaires<br>(démarre le <em>lendemain</em> de la livraison)</div>
+      <div class="report"><strong>Report éventuel</strong>Si J+14 = samedi, dimanche ou férié<br>→ 1<sup>er</sup> jour ouvrable suivant, 23h59</div>
+    </div>
+    <p class="legende">Le dernier jour court jusqu'à 23:59:59. La date limite est figée dans la demande au moment du dépôt (valeur probatoire en cas de litige).</p>
+
+    <h3>Jours fériés pris en compte (France métropolitaine)</h3>
+    <p>
+      1<sup>er</sup> janvier · Lundi de Pâques · 1<sup>er</sup> mai · 8 mai · Ascension ·
+      Lundi de Pentecôte · 14 juillet · 15 août · 1<sup>er</sup> novembre · 11 novembre · 25 décembre.
+      Les fêtes mobiles sont calculées par l'algorithme de Meeus/Butcher (aucune dépendance PHP).
+    </p>
+
+    <h3>Exemples vérifiés par tests</h3>
+    <table>
+      <tr><th>Livraison</th><th>J+14</th><th>Date limite retenue</th><th>Pourquoi</th></tr>
+      <tr><td>Vendredi 5 juin 2026</td><td>Vendredi 19 juin</td><td><strong>19 juin 23h59</strong></td><td>Jour ouvrable, pas de report</td></tr>
+      <tr><td>Samedi 6 juin 2026</td><td>Samedi 20 juin</td><td><strong>Lundi 22 juin 23h59</strong></td><td>Échéance un samedi → report lundi</td></tr>
+      <tr><td>Mardi 30 juin 2026</td><td>Mardi 14 juillet</td><td><strong>Mercredi 15 juillet 23h59</strong></td><td>Échéance un jour férié</td></tr>
+      <tr><td>Vendredi 11 décembre 2026</td><td>Vendredi 25 décembre</td><td><strong>Lundi 28 décembre 23h59</strong></td><td>Noël + week-end → report lundi</td></tr>
+      <tr><td>Lundi 23 mars 2026</td><td>Lundi de Pâques (6 avril)</td><td><strong>Mardi 7 avril 23h59</strong></td><td>Échéance une fête mobile</td></tr>
+    </table>
+
+    <div class="encart info">
+      <strong>Commande non encore livrée.</strong>
+      La loi autorise la rétractation dès la conclusion du contrat. Tant que la commande n'a pas de
+      date de livraison, le bouton reste affiché (sauf si l'option est désactivée) et la demande est
+      marquée « non livrée au moment de la demande » côté SAV.
+    </div>
+    <div class="encart danger">
+      <strong>Prérequis critique : la date de livraison.</strong>
+      Le décompte s'appuie sur le champ <code>delivery_date</code> de la commande, renseigné par
+      PrestaShop quand la commande passe dans un état dont la case
+      <em>« Considérer l'état associé comme livré »</em> est cochée
+      (Paramètres de la boutique &gt; Paramètres des commandes &gt; États).
+      Vérifiez vos états « Livré » avant la mise en production.
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="client">
+    <h2><span class="num">4</span>Parcours client (front-office)</h2>
+    <ol class="etapes">
+      <li>
+        <strong class="titre">Accès : bouton, lien footer ou parcours invité</strong>
+        <p>Bouton <em>« Se rétracter »</em> dans <em>Mon compte &gt; Mes commandes</em> et sur le détail de
+        commande (uniquement pendant la fenêtre légale). Lien <em>« Exercer mon droit de rétractation »</em>
+        en pied de page de toutes les pages, menant à une page dédiée : le client connecté y retrouve ses
+        commandes éligibles ; l'invité s'identifie par <strong>email + référence de commande</strong>.</p>
+      </li>
+      <li>
+        <strong class="titre">Formulaire type prérempli (modal) + sélection des produits</strong>
+        <p>Reprend les mentions de l'annexe R221-1 : identité du vendeur, référence et dates de la
+        commande, nom / adresse / email du consommateur. Le client choisit les <strong>produits et
+        quantités</strong> concernés (rétractation totale par défaut, partielle possible — permise par la
+        loi). Champ « motif » <em>explicitement facultatif</em>.</p>
+      </li>
+      <li>
+        <strong class="titre">Confirmation</strong>
+        <p><em>« Confirmer la rétractation »</em> : la demande est enregistrée sous une
+        <strong>référence non séquentielle</strong> (ex. RET-K7QPMD2A) avec la date limite légale et les
+        produits/quantités figés, et un retour produit natif est créé (état « En attente de confirmation »).</p>
+      </li>
+      <li>
+        <strong class="titre">Accusé de réception immédiat</strong>
+        <p>PDF d'accusé (logo boutique, produits avec référence et prix TTC, sous-total, frais de livraison,
+        <strong>montant à rembourser</strong> — livraison incluse si rétractation totale, prorata sinon)
+        joint à l'email client, téléchargeable depuis la modal. Le SAV reçoit en parallèle un email
+        de notification.</p>
+      </li>
+      <li>
+        <strong class="titre">Suivi</strong>
+        <p>La ligne de commande affiche un badge de statut (« Rétractation en cours de vérification »,
+        « validée — retour en cours », « remboursée »). Le retour natif reste visible dans
+        « Mes retours de marchandise ».</p>
+      </li>
+    </ol>
+    <div class="encart info">
+      <strong>Le client est invité à ne pas renvoyer le produit</strong> avant d'avoir reçu la
+      procédure de retour — mention présente dans la modal, l'accusé PDF et l'email.
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="sav">
+    <h2><span class="num">5</span>Workflow SAV (back-office)</h2>
+    <p>Un onglet <strong>SAV &gt; Rétractations</strong> liste toutes les demandes avec : commande,
+    client, date de dépôt, date limite légale, badge « dans les délais », statut.</p>
+
+    <h3>Statuts d'une demande</h3>
+    <table>
+      <tr><th>Statut</th><th>Signification</th><th>Retour natif lié</th></tr>
+      <tr>
+        <td><span class="badge orange">À vérifier</span></td>
+        <td>Demande déposée par le client, en attente de contrôle SAV</td>
+        <td>1 — En attente de confirmation</td>
+      </tr>
+      <tr>
+        <td><span class="badge bleu">Conforme — procédure envoyée</span></td>
+        <td>Éligibilité validée, email de procédure de retour envoyé au client</td>
+        <td>2 — En attente du colis</td>
+      </tr>
+      <tr>
+        <td><span class="badge rouge">Refusée</span></td>
+        <td>Demande non conforme — motif obligatoire, communiqué au client par email</td>
+        <td>4 — Retour refusé</td>
+      </tr>
+      <tr>
+        <td><span class="badge vert">Remboursée</span></td>
+        <td>Produit reçu, contrôlé, remboursement effectué — email de confirmation envoyé au client</td>
+        <td>5 — Retour terminé</td>
+      </tr>
+    </table>
+    <p>Chaque changement de statut déclenche automatiquement un email au client
+    (procédure de retour / refus motivé / confirmation de remboursement).</p>
+
+    <h3>Vue détaillée d'une demande</h3>
+    <ul>
+      <li>Toutes les données légales : date de dépôt, date de livraison constatée, <strong>date limite
+        légale figée</strong>, dépôt dans les délais ou non, motif du client ;</li>
+      <li>liens directs vers la <strong>fiche commande</strong> et le <strong>retour natif</strong> ;</li>
+      <li>tableau des produits avec alerte <span class="badge rouge">Potentiellement exclu — à vérifier</span>
+        sur les produits visés par une exclusion configurée (art. L221-28) ;</li>
+      <li>téléchargement de l'<strong>accusé de réception PDF</strong> archivé ;</li>
+      <li>rappel des points de contrôle légaux (délai, exclusions, remboursement sous 14 jours).</li>
+    </ul>
+
+    <h3>Actions disponibles</h3>
+    <ol class="etapes">
+      <li>
+        <strong class="titre">Conforme — envoyer la procédure de retour</strong>
+        <p>Envoie au client l'email contenant le texte de procédure configurable (adresse de retour,
+        consignes d'emballage, rappel des frais de renvoi et du remboursement) et passe le retour
+        natif en « En attente du colis ».</p>
+      </li>
+      <li>
+        <strong class="titre">Refuser la demande</strong>
+        <p>Motif obligatoire (hors délai, exclusion légale, produits déjà retournés…), envoyé au
+        client avec mention de la possibilité de recourir à un médiateur de la consommation.</p>
+      </li>
+      <li>
+        <strong class="titre">Produit reçu et contrôlé — marquer comme remboursée</strong>
+        <p>Après réception et contrôle du produit. Le remboursement réel s'effectue depuis la fiche
+        commande (remboursement standard / partiel natif), comme pour n'importe quelle commande.</p>
+      </li>
+    </ol>
+
+    <div class="encart alerte">
+      <strong>Délai de remboursement.</strong> La loi impose le remboursement au plus tard
+      <strong>14 jours</strong> après récupération du bien ou réception de la preuve d'expédition
+      (art. L221-24), avec majorations légales en cas de retard. Traitez les demandes
+      « Conforme — procédure envoyée » en priorité dès réception des colis.
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="installation">
+    <h2><span class="num">6</span>Installation</h2>
+    <ol>
+      <li>Zipper le dossier <code>retractationcommande/</code> puis l'installer via
+        <strong>Modules &gt; Gestionnaire de modules &gt; Installer un module</strong>
+        (ou déposer le dossier dans <code>/modules/</code> et installer depuis la liste).</li>
+      <li>L'installation crée automatiquement :
+        <ul>
+          <li>la table <code>ps_retractation_request</code> ;</li>
+          <li>l'onglet BO <strong>SAV &gt; Rétractations</strong> ;</li>
+          <li>les hooks front (liste des commandes, détail de commande) ;</li>
+          <li>les valeurs de configuration par défaut (email SAV = email boutique).</li>
+        </ul>
+      </li>
+      <li>Renseigner la <a href="#configuration">configuration</a> du module.</li>
+    </ol>
+
+    <h3>Check-list avant mise en production</h3>
+    <table>
+      <tr><th style="width:55%">Point à vérifier</th><th>Où</th></tr>
+      <tr>
+        <td>Les états logistiques « Livré » ont la case <em>« Considérer l'état associé comme livré »</em> cochée (pose la date de livraison, point de départ du décompte)</td>
+        <td>Paramètres de la boutique &gt; Paramètres des commandes &gt; États</td>
+      </tr>
+      <tr>
+        <td>Les retours natifs sont activés (<code>PS_ORDER_RETURN</code>) pour que le client suive ses retours dans « Mes retours de marchandise »</td>
+        <td>SAV &gt; Retours produits &gt; Options</td>
+      </tr>
+      <tr>
+        <td>Les CGV mentionnent le droit de rétractation, le formulaire type, les frais de renvoi <strong>et l'existence/emplacement de la fonctionnalité en ligne</strong> (clause bilingue prête à copier fournie dans la configuration du module). Sinon : délai prolongé de 12 mois</td>
+        <td>Vos CGV / page légale — clause fournie dans Modules &gt; Configurer</td>
+      </tr>
+      <tr>
+        <td>Le lien « Exercer mon droit de rétractation » est visible en pied de page (exigence de visibilité de l'ordonnance n°2026-2)</td>
+        <td>Front-office, toutes pages</td>
+      </tr>
+      <tr>
+        <td>Le bouton s'affiche correctement sur le thème (test avec une commande livrée récente)</td>
+        <td>Front-office &gt; Mon compte &gt; Mes commandes</td>
+      </tr>
+      <tr>
+        <td>Test complet du parcours : demande → email accusé + PDF → notification SAV → validation → email procédure</td>
+        <td>Compte client de test</td>
+      </tr>
+    </table>
+
+    <div class="encart info">
+      <strong>Thème non « classic ».</strong> Sur la liste des commandes, le bouton est injecté en
+      JavaScript en repérant les liens contenant <code>id_order=</code>. Sur un thème fortement
+      personnalisé, il peut être nécessaire d'ajuster le sélecteur dans
+      <code>views/js/front.js</code> (fonction <code>injectHistoryButtons</code>). Le bouton du
+      détail de commande, lui, est rendu côté serveur (hook <code>displayOrderDetail</code>) et
+      fonctionne sur tous les thèmes.
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="configuration">
+    <h2><span class="num">7</span>Configuration</h2>
+    <p>Accès : <strong>Modules &gt; Gestionnaire de modules &gt; Rétractation de commande &gt; Configurer</strong>.</p>
+    <table>
+      <tr><th style="width:30%">Paramètre</th><th>Rôle</th><th style="width:18%">Défaut</th></tr>
+      <tr>
+        <td><strong>Afficher le lien en pied de page</strong></td>
+        <td>Lien « Exercer mon droit de rétractation » sur toutes les pages (exigence de visibilité de l'ordonnance — désactivable si besoin ; le lien reste dans l'espace client)</td>
+        <td>Oui</td>
+      </tr>
+      <tr>
+        <td><strong>Libellé du lien</strong></td>
+        <td>Texte du lien footer + espace client, entièrement personnalisable</td>
+        <td>« Exercer mon droit de rétractation »</td>
+      </tr>
+      <tr>
+        <td><strong>Délai de rétractation (jours)</strong></td>
+        <td>14 minimum (la loi interdit moins) ; extensible si vous offrez un délai commercial plus long</td>
+        <td>14</td>
+      </tr>
+      <tr>
+        <td><strong>Email de notification SAV</strong></td>
+        <td>Adresse recevant la notification à chaque nouvelle demande</td>
+        <td>Email de la boutique</td>
+      </tr>
+      <tr>
+        <td><strong>Créer un retour natif PrestaShop</strong></td>
+        <td>Chaque rétractation crée un retour dans SAV &gt; Retours produits (recommandé)</td>
+        <td>Oui</td>
+      </tr>
+      <tr>
+        <td><strong>Masquer le formulaire de retour natif</strong></td>
+        <td>Retire le formulaire de retour historique du détail de commande : un seul point d'entrée, le parcours légal du module (le suivi « Mes retours » reste actif)</td>
+        <td>Oui</td>
+      </tr>
+      <tr>
+        <td><strong>Autoriser avant livraison</strong></td>
+        <td>Bouton visible sur les commandes non livrées (conforme à la loi : droit ouvert dès la conclusion du contrat)</td>
+        <td>Oui</td>
+      </tr>
+      <tr>
+        <td><strong>Catégories exclues (IDs)</strong></td>
+        <td rowspan="2">Produits exclus du droit de rétractation au titre de l'art. L221-28
+          (sur mesure, périssables, hygiène…). Le bouton est masqué si <em>toute</em> la commande est
+          exclue ; sinon les produits concernés sont signalés au SAV.</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Produits exclus (IDs)</strong></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Procédure de retour</strong></td>
+        <td>Texte riche envoyé au client à la validation : adresse de retour, consignes, rappels
+          légaux (frais de renvoi, remboursement)</td>
+        <td>Texte type avec l'adresse de la boutique</td>
+      </tr>
+    </table>
+    <p>
+      Sous le formulaire, un panneau fournit la <strong>clause CGV bilingue (FR/EN) prête à copier</strong>,
+      générée avec votre libellé de lien, votre délai et l'URL de la page de rétractation — à insérer dans
+      vos CGV (obligation d'information de l'ordonnance ; à adapter si certains produits relèvent des
+      exceptions de l'art. L221-28).
+    </p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="technique">
+    <h2><span class="num">8</span>Référence technique</h2>
+    <h3>Arborescence</h3>
+<pre><code>retractationcommande/
+├── retractationcommande.php                  # Module : hooks (footer, compte, commandes), config BO, clause CGV
+├── classes/
+│   ├── RetractationDelai.php                 # Délai légal : 14 j min + lendemain + fériés FR (testé)
+│   ├── RetractationRequest.php               # Entité demande + référence RMA + quantités restantes + pont natif
+│   └── RetractationPdf.php                   # Accusé de réception PDF (TCPDF, stockage protégé)
+├── controllers/
+│   ├── front/formulaire.php                  # Page "Exercer mon droit" : connecté ou invité (email + réf)
+│   ├── front/demande.php                     # Modal (form), confirmation, téléchargement PDF
+│   └── admin/AdminRetractationController.php # SAV &gt; Rétractations : liste, vue, actions
+├── views/
+│   ├── js/front.js                           # Bouton + badge statut + modal + masquage retour natif
+│   ├── css/front.css
+│   └── templates/                            # modal, PDF, page formulaire, liens footer/compte, vue admin
+├── mails/fr/ + mails/en/                     # accusé, notif SAV, procédure, refus, remboursée (logo {shop_logo})
+└── docs/documentation.html                   # Ce document</code></pre>
+
+    <h3>Base de données</h3>
+    <p>Table <code>ps_retractation_request</code> :</p>
+    <table>
+      <tr><th>Colonne</th><th>Rôle</th></tr>
+      <tr><td><code>reference</code></td><td>Référence publique non séquentielle type RMA (RET-XXXXXXXX) — l'ID numérique reste interne au BO</td></tr>
+      <tr><td><code>id_order</code> / <code>id_customer</code></td><td>Commande et client concernés</td></tr>
+      <tr><td><code>id_order_return</code></td><td>Retour natif lié (0 si création désactivée)</td></tr>
+      <tr><td><code>products_snapshot</code></td><td>JSON des produits/quantités/prix demandés, figé au dépôt (rétractation partielle)</td></tr>
+      <tr><td><code>status</code></td><td><code>pending</code> / <code>accepted</code> / <code>refused</code> / <code>refunded</code></td></tr>
+      <tr><td><code>delivery_date</code></td><td>Date de livraison constatée au moment du dépôt</td></tr>
+      <tr><td><code>legal_deadline</code></td><td>Date limite légale calculée et <strong>figée</strong> au dépôt</td></tr>
+      <tr><td><code>within_deadline</code></td><td>Demande déposée dans la fenêtre légale</td></tr>
+      <tr><td><code>message</code> / <code>refusal_reason</code></td><td>Motif facultatif du client / motif de refus SAV</td></tr>
+      <tr><td><code>pdf_filename</code></td><td>Accusé de réception PDF archivé</td></tr>
+    </table>
+
+    <h3>Sécurité</h3>
+    <ul>
+      <li>Front controller accessible aux <strong>clients connectés uniquement</strong> ; propriété de la
+        commande vérifiée à chaque appel ;</li>
+      <li>jeton anti-CSRF par commande (dérivé de la clé sécurisée du client) sur toutes les actions ;</li>
+      <li>éligibilité <strong>revalidée côté serveur</strong> à la confirmation (le masquage du bouton ne suffit pas) ;</li>
+      <li>PDF stockés hors accès direct (<code>.htaccess</code> deny) et servis après contrôle de propriété ;</li>
+      <li>entrées utilisateur validées (<code>isCleanHtml</code>) et échappées dans les emails.</li>
+    </ul>
+
+    <h3>Emails envoyés</h3>
+    <p>Tous les emails affichent le logo de la boutique en en-tête (variable native <code>{shop_logo}</code>,
+    image embarquée par PrestaShop). Langue : celle de la commande si le dossier <code>mails/&lt;iso&gt;/</code>
+    existe, sinon anglais.</p>
+    <table>
+      <tr><th>Template</th><th>Destinataire</th><th>Déclencheur</th></tr>
+      <tr><td><code>retractation_accuse</code></td><td>Client (PDF joint)</td><td>Confirmation de la rétractation</td></tr>
+      <tr><td><code>retractation_sav</code></td><td>Email SAV configuré</td><td>Confirmation de la rétractation</td></tr>
+      <tr><td><code>retractation_procedure</code></td><td>Client</td><td>Validation SAV (« Conforme »)</td></tr>
+      <tr><td><code>retractation_refus</code></td><td>Client</td><td>Refus SAV (motif inclus)</td></tr>
+      <tr><td><code>retractation_remboursee</code></td><td>Client</td><td>Passage au statut « Remboursée »</td></tr>
+    </table>
+
+    <h3>Multilingue</h3>
+    <ul>
+      <li>Front-office, modal, page formulaire et PDF : chaînes via <code>{l ... mod='retractationcommande'}</code>,
+        traduisibles dans <strong>BO &gt; International &gt; Traductions &gt; Modules installés</strong> (source en français) ;</li>
+      <li>emails fournis en <strong>français et anglais</strong> ; pour une langue supplémentaire, dupliquez un dossier
+        <code>mails/&lt;iso&gt;/</code> et traduisez les 5 templates (fallback automatique sur l'anglais sinon) ;</li>
+      <li>clause CGV fournie en FR et EN.</li>
+    </ul>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="faq">
+    <h2><span class="num">9</span>FAQ</h2>
+
+    <h3>Le bouton n'apparaît pas sur une commande : pourquoi ?</h3>
+    <p>Dans l'ordre des causes probables :</p>
+    <ul>
+      <li>le <strong>délai légal est expiré</strong> (livraison + 14 jours, reports compris) ;</li>
+      <li>une <strong>demande active existe déjà</strong> pour cette commande ;</li>
+      <li>la commande est <strong>annulée, remboursée ou en erreur de paiement</strong> ;</li>
+      <li>tous les produits de la commande sont dans les <strong>exclusions configurées</strong> ;</li>
+      <li>la commande n'est pas livrée et l'option « Autoriser avant livraison » est désactivée ;</li>
+      <li>le client n'est pas connecté, ou le thème nécessite un ajustement du sélecteur JS
+        (voir section Installation).</li>
+    </ul>
+
+    <h3>Une demande arrive hors délai, que se passe-t-il ?</h3>
+    <p>Le bouton n'étant affiché que pendant la fenêtre légale, le cas est rare (commande passée
+    juste avant minuit, etc.). L'éligibilité est de toute façon <strong>revérifiée côté serveur</strong>
+    à la confirmation : la demande est alors rejetée avec un message explicite.</p>
+
+    <h3>Comment fonctionne la rétractation partielle ?</h3>
+    <p>La loi permet de ne renvoyer qu'une partie des biens. Dans la modal, le client ajuste les
+    quantités par produit (par défaut : tout est sélectionné ; « 0 — conserver » pour garder un produit).
+    Tant que la fenêtre légale est ouverte, il peut déposer une <strong>nouvelle demande</strong> pour les
+    quantités restantes. En cas de renvoi partiel, les frais de livraison sont remboursés
+    <strong>au prorata</strong> (art. L221-24) — l'accusé PDF l'indique et l'estimation est confirmée
+    par le SAV.</p>
+
+    <h3>Le remboursement est-il automatique ?</h3>
+    <p>Non, volontairement : la loi autorise à différer le remboursement jusqu'à récupération du bien
+    ou preuve d'expédition. L'action « Marquer comme remboursée » trace la décision ; le remboursement
+    réel s'effectue via le remboursement standard/partiel natif de la fiche commande (compatible avec
+    tous les modules de paiement).</p>
+
+    <h3>Et les commandes passées avant l'installation du module ?</h3>
+    <p>Elles sont couvertes : l'éligibilité est calculée à la volée à partir de la date de livraison,
+    quelle que soit la date d'installation.</p>
+
+    <h3>Un client invité (sans compte) peut-il se rétracter ?</h3>
+    <p>Oui — exigence de l'ordonnance. Via le lien du footer, il saisit son <strong>email + la référence
+    de commande</strong> (message d'erreur volontairement générique pour ne pas révéler l'existence d'une
+    référence). Une fois la commande retrouvée, le parcours est identique : formulaire type, accusé PDF,
+    suivi SAV.</p>
+
+    <h3>Que faut-il régler dans « SAV &gt; Retours produits &gt; Options » ?</h3>
+    <p><strong>Activer les retours produits : OUI</strong> (recommandé), et « Nombre de jours » à 14
+    par cohérence. <strong>Il n'y a aucun conflit possible</strong> entre le module et les retours
+    natifs : le module les pilote (création + synchronisation des états) et masque le formulaire de
+    retour natif du détail de commande (option activée par défaut) — un seul point d'entrée, le
+    parcours légal.</p>
+    <table>
+      <tr><th>Réglage natif</th><th>Conséquence</th></tr>
+      <tr>
+        <td><strong>Oui</strong> (recommandé)</td>
+        <td>Le client dispose de la page « Mes retours de marchandise » pour suivre l'avancement de son
+        retour (états synchronisés par le module). Le formulaire natif redondant est masqué par le module.</td>
+      </tr>
+      <tr>
+        <td><strong>Non</strong></td>
+        <td>Le module fonctionne intégralement quand même (création des retours, workflow SAV, emails,
+        PDF). Le client perd seulement la page de suivi native — il lui reste les badges du module et
+        les emails.</td>
+      </tr>
+    </table>
+
+    <h3>Pourquoi le PDF s'affichait-il dans le corps du message sur Apple Mail ?</h3>
+    <p>Le PDF est envoyé en <em>pièce jointe</em> (disposition « attachment »), mais Apple Mail
+    prévisualise les PDF <strong>d'une seule page</strong> dans le fil du message — comportement du
+    client mail, ignoré du paramétrage serveur. Le module contourne le problème depuis la v1.1 :
+    l'accusé comporte une <strong>page 2 « Rappel de vos droits »</strong> (délai, remboursement,
+    exceptions L221-28, médiation) — un PDF multi-pages s'affiche en icône de pièce jointe dans
+    Apple Mail. Si un destinataire voit encore un aperçu en ligne, c'est un réglage local de son
+    Mail (clic droit sur la pièce jointe &gt; « Afficher en tant qu'icône »).</p>
+
+    <h3>Boutique livrant en Alsace-Moselle ?</h3>
+    <p>Les deux jours fériés locaux (Vendredi saint, 26 décembre) ne sont pas inclus par défaut.
+    Ils s'ajoutent en deux lignes dans <code>RetractationDelai::getFrenchHolidays()</code> si votre
+    clientèle le justifie — leur absence ne réduit jamais le délai du consommateur de plus d'un jour
+    ouvrable et reste l'interprétation standard (jours fériés nationaux).</p>
+
+    <h3>Que conserve-t-on comme preuves en cas de litige ?</h3>
+    <ul>
+      <li>la demande horodatée avec la <strong>date limite légale figée</strong> au moment du dépôt ;</li>
+      <li>l'<strong>accusé de réception PDF</strong> archivé et téléchargeable depuis le BO ;</li>
+      <li>les emails envoyés (accusé, procédure, refus motivé) ;</li>
+      <li>l'historique du retour natif lié.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  Rétractation Commande v1.0.0 — Magic Garden · Documentation générée pour PrestaShop 8 ·
+  Référence légale : <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F10485" target="_blank" rel="noopener">service-public.gouv.fr — F10485</a>
+</footer>
+
+</body>
+</html>
