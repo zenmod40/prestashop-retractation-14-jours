@@ -132,16 +132,18 @@ Puis :
 
 ```
 retractationcommande/
-├── retractationcommande.php                  # module : hooks FO, config BO, install (table + onglet SAV)
+├── retractationcommande.php                  # module : hooks FO, config BO, install (table + onglet SAV), clause CGV 8 langues
 ├── classes/
 │   ├── RetractationDelai.php                 # délai légal (14j + lendemain + fériés FR) — testé
 │   ├── RetractationRequest.php               # entité demande + éligibilité + pont vers OrderReturn natif
 │   └── RetractationPdf.php                   # accusé de réception PDF (TCPDF, stockage protégé)
 ├── controllers/
 │   ├── front/demande.php                     # modal (form), confirmation, téléchargement PDF
+│   ├── front/formulaire.php                  # page « Exercer mon droit » + parcours invité
 │   └── admin/AdminRetractationController.php # BO SAV > Rétractations (liste, vue, actions)
-├── views/ (js modal + css + templates front/hook/admin + PDF)
-└── mails/fr + mails/en (accusé, notif SAV, procédure, refus)
+├── views/                                    # js modal + css + templates front/hook/admin + PDF
+├── translations/                             # interface front : en, es, de, it, nl, pl, pt (FR = source via {l})
+└── mails/                                    # 6 emails (HTML + txt) × 8 langues : fr, en, es, de, it, nl, pl, pt
 ```
 
 ## Auteur
