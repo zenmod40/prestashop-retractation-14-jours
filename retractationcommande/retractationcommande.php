@@ -8,7 +8,7 @@
  * et ajoute la couche légale : fenêtre de 14 jours (départ le lendemain de la
  * livraison, prolongation au 1er jour ouvrable), formulaire type de rétractation
  * (annexe art. R221-1), accusé de réception PDF + email (art. L221-21 al.3),
- * lien visible sur tout le site (footer), parcours invité, file de vérification SAV.
+ * lien visible sur tout le site (footer), parcours invité, liste de vérification SAV.
  *
  * @author    Magic Garden <https://magicgarden.fr>
  * @copyright 2026 Magic Garden
@@ -47,7 +47,7 @@ class RetractationCommande extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Rétractation de commande (loi 14 jours)');
-        $this->description = $this->l('Fonctionnalité de rétractation en ligne (ordonnance n°2026-2) : lien visible sur tout le site, bouton dans l\'espace client pendant le délai légal, parcours invité, formulaire type, accusé de réception PDF, file de vérification SAV adossée aux retours natifs.');
+        $this->description = $this->l('Fonctionnalité de rétractation en ligne (ordonnance n°2026-2) : lien visible sur tout le site, bouton dans l\'espace client pendant le délai légal, parcours invité, formulaire type, accusé de réception PDF, liste de vérification SAV adossée aux retours natifs.');
         $this->confirmUninstall = $this->l('Les demandes de rétractation enregistrées seront conservées en base de données (preuves légales) et retrouvées en cas de réinstallation. Continuer ?');
     }
 
