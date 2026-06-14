@@ -112,7 +112,7 @@ outils habituels et le client suit son retour dans son espace client comme d'hab
 Récupérez le **ZIP prêt à installer**, au choix :
 
 - **Tout public** → [magicgarden.fr/retractation.php](https://magicgarden.fr/retractation.php) (version testée et tenue à jour).
-- **Développeurs** → la dernière [**Release GitHub**](https://github.com/NicoVmax/prestashop-retractation-14-jours/releases) (ZIP attaché à chaque version).
+- **Développeurs** → la dernière [**Release GitHub**](https://github.com/zenmod40/prestashop-retractation-14-jours/releases) (ZIP attaché à chaque version).
 
 Puis :
 
