@@ -194,7 +194,19 @@ class AdminRetractationController extends ModuleAdminController
         $request->status = RetractationRequest::STATUS_ACCEPTED;
         $request->update();
 
-        if ($request->delivery_date) {
+        // Phase figée au dépôt (repli sur delivery_date pour les anciennes demandes).
+        $phase = $request->shipping_phase ?: ($request->delivery_date ? 'delivered' : 'pending');
+
+        if ($phase === 'pending') {
+            // Commande non expédiée : annulation, aucun retour produit.
+            $this->sendCustomerEmail(
+                $request,
+                'retractation_annulation',
+                $this->l('Votre rétractation est validée — commande annulée avant expédition')
+            );
+            $this->confirmations[] = $this->l('Demande validée (commande non expédiée) : le client a été informé de l\'annulation. Pensez à annuler l\'expédition et à effectuer le remboursement depuis la fiche commande, puis marquez la demande comme remboursée.');
+        } else {
+            // Livrée ou en cours d'acheminement : procédure de retour.
             $request->setNativeReturnState(RetractationCommande::OR_STATE_WAITING_PACKAGE);
             $this->sendCustomerEmail(
                 $request,
@@ -202,14 +214,9 @@ class AdminRetractationController extends ModuleAdminController
                 $this->l('Votre rétractation est validée — procédure de retour'),
                 ['{procedure}' => Configuration::get('RETRACTATION_PROCEDURE_TEXT')]
             );
-            $this->confirmations[] = $this->l('Demande validée : la procédure de retour a été envoyée au client.');
-        } else {
-            $this->sendCustomerEmail(
-                $request,
-                'retractation_annulation',
-                $this->l('Votre rétractation est validée — commande annulée avant expédition')
-            );
-            $this->confirmations[] = $this->l('Demande validée (commande non expédiée) : le client a été informé de l\'annulation. Pensez à annuler l\'expédition et à effectuer le remboursement depuis la fiche commande, puis marquez la demande comme remboursée.');
+            $this->confirmations[] = ($phase === 'shipped')
+                ? $this->l('Demande validée (commande en cours d\'acheminement) : la procédure de retour a été envoyée au client. Il pourra refuser le colis ou le renvoyer.')
+                : $this->l('Demande validée : la procédure de retour a été envoyée au client.');
         }
     }
 

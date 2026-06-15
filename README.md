@@ -22,6 +22,14 @@ gratuite, visible et facilement accessible), applicables au **19 juin 2026**.
 - **Sélection automatique** de la langue (commande/navigation du client) ; repli sur l'anglais (emails) ou le français (interface).
 - **Terminologie juridique adaptée** par langue (Widerruf, recesso, herroeping, desistimiento, livre resolução, odstąpienie) ; les références d'articles (L221-x) restent en français (droit français cité).
 
+## Nouveautés v1.3.1
+
+- **Onglet « Mapping des statuts »** dans la configuration (façon CoolStats) : une matrice interactive associe chaque statut de commande à un rôle —
+  **« Livré »** (démarre le délai légal de 14 jours, en complément du drapeau natif PrestaShop) et **« Bloquant »** (masque le bouton de rétractation, en plus des états annulé/remboursé/erreur toujours bloquants).
+- **Remplissage automatique dynamique** : au lieu d'un preset d'IDs en dur, le module détecte chaque statut réel via ses *drapeaux* PrestaShop (`shipped`, `delivery`, `paid`) **et** des mots-clés multilingues du nom (livré, annulé, remboursé, delivered, cancel…). Pré-rempli dès l'installation.
+- Matrice avec pastille couleur, nombre de commandes sur 12 mois, recherche, résumé live et détection de conflits (un statut ne peut être à la fois Livré et Bloquant).
+- Le délai de 14 jours peut désormais démarrer sur un état « livré » mappé, via la date d'entrée dans cet état (`order_history`) — utile pour les boutiques dont l'état livré n'a pas le drapeau natif.
+
 ## Nouveautés v1.1
 
 - **Lien footer** « Exercer mon droit de rétractation » sur toutes les pages (libellé personnalisable, activable/désactivable)

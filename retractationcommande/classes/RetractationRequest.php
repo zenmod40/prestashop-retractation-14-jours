@@ -40,6 +40,8 @@ class RetractationRequest extends ObjectModel
     public $products_snapshot;
     /** @var string|null date de livraison constatée à la demande */
     public $delivery_date;
+    /** @var string phase logistique figée au dépôt : delivered / shipped / pending */
+    public $shipping_phase = 'pending';
     /** @var string|null date limite légale calculée à la demande */
     public $legal_deadline;
     /** @var int demande déposée dans le délai légal */
@@ -65,6 +67,7 @@ class RetractationRequest extends ObjectModel
             'refusal_reason' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'],
             'products_snapshot' => ['type' => self::TYPE_STRING],
             'delivery_date' => ['type' => self::TYPE_DATE, 'allow_null' => true],
+            'shipping_phase' => ['type' => self::TYPE_STRING, 'size' => 16],
             'legal_deadline' => ['type' => self::TYPE_DATE, 'allow_null' => true],
             'within_deadline' => ['type' => self::TYPE_BOOL, 'validate' => 'isBool'],
             'pdf_filename' => ['type' => self::TYPE_STRING, 'size' => 255],
@@ -205,19 +208,232 @@ class RetractationRequest extends ObjectModel
     }
 
     /**
+     * États de commande avec métadonnées pour l'onglet "Mapping des statuts" :
+     * id, nom, couleur, drapeaux natifs et nombre de commandes (12 derniers mois).
+     *
+     * @return array<int, array>
+     */
+    public static function getOrderStatesWithMeta()
+    {
+        $idLang = (int) Context::getContext()->language->id;
+        $prefix = _DB_PREFIX_;
+
+        $rows = Db::getInstance()->executeS(
+            'SELECT os.`id_order_state`, os.`color`, os.`shipped`, os.`delivery`, os.`paid`, os.`logable`, osl.`name`
+             FROM `' . $prefix . 'order_state` os
+             LEFT JOIN `' . $prefix . 'order_state_lang` osl
+                ON osl.`id_order_state` = os.`id_order_state` AND osl.`id_lang` = ' . $idLang . '
+             WHERE os.`deleted` = 0
+             ORDER BY os.`id_order_state` ASC'
+        ) ?: [];
+
+        $since = date('Y-m-d', strtotime('-12 months')) . ' 00:00:00';
+        $counts = [];
+        $countRows = Db::getInstance()->executeS(
+            'SELECT `current_state`, COUNT(*) AS n FROM `' . $prefix . 'orders`
+             WHERE `date_add` >= \'' . pSQL($since) . '\' GROUP BY `current_state`'
+        ) ?: [];
+        foreach ($countRows as $r) {
+            $counts[(int) $r['current_state']] = (int) $r['n'];
+        }
+
+        $list = [];
+        foreach ($rows as $s) {
+            $id = (int) $s['id_order_state'];
+            $list[] = [
+                'id_state' => $id,
+                'name' => $s['name'] ?: ('État #' . $id),
+                'color' => $s['color'] ?: '#9ca3af',
+                'shipped' => (bool) $s['shipped'],
+                'delivery' => (bool) $s['delivery'],
+                'paid' => (bool) $s['paid'],
+                'logable' => (bool) $s['logable'],
+                'count' => $counts[$id] ?? 0,
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Détection automatique du mapping (utilisée à l'installation et par le
+     * bouton "Remplissage automatique"). Contrairement à un preset d'IDs en
+     * dur, on inspecte chaque état réel : drapeaux natifs PrestaShop ET
+     * mots-clés du nom (multilingue) — robuste sur les statuts personnalisés.
+     *
+     * @return array{DELIVERED: int[], BLOCKED: int[]}
+     */
+    public static function suggestStateMapping()
+    {
+        $delivered = [];
+        $shipped = [];
+        $blocked = [];
+
+        // Mots-clés multilingues par rôle.
+        $kwDelivered = ['livr', 'deliver', 'entreg', 'conseg', 'gelief', 'zugestellt', 'dostarcz'];
+        $kwShipped = ['expédi', 'expedi', 'shipped', 'envoy', 'spedi', 'versand', 'verzonden', 'enviad', 'wysł', 'wysy', 'en transit', 'in transit'];
+        $kwBlocked = ['annul', 'rembours', 'cancel', 'refund', 'erreur', 'error', 'litige', 'storn',
+            'errore', 'reembols', 'rimbors', 'devol', 'geannul', 'terugbet', 'anulow', 'zwrot', 'błąd', 'fout'];
+
+        foreach (self::getOrderStatesWithMeta() as $s) {
+            $id = (int) $s['id_state'];
+            $name = Tools::strtolower($s['name']);
+
+            if (self::nameMatches($name, $kwBlocked)) {
+                $blocked[] = $id;
+                continue; // un état bloquant n'est ni livré ni expédié
+            }
+            // "Livré" : drapeau natif delivery OU mot-clé de livraison.
+            if ($s['delivery'] || self::nameMatches($name, $kwDelivered)) {
+                $delivered[] = $id;
+                continue;
+            }
+            // "Expédié / en cours d'acheminement" : drapeau natif shipped OU mot-clé.
+            if ($s['shipped'] || self::nameMatches($name, $kwShipped)) {
+                $shipped[] = $id;
+            }
+        }
+
+        // Filet de sécurité : états natifs annulé / remboursé / erreur.
+        foreach ([(int) Configuration::get('PS_OS_CANCELED'), (int) Configuration::get('PS_OS_REFUND'), (int) Configuration::get('PS_OS_ERROR')] as $id) {
+            if ($id && !in_array($id, $blocked, true)) {
+                $blocked[] = $id;
+            }
+        }
+        $idDelivered = (int) Configuration::get('PS_OS_DELIVERED');
+        if ($idDelivered && !in_array($idDelivered, $delivered, true)) {
+            $delivered[] = $idDelivered;
+        }
+        $idShipped = (int) Configuration::get('PS_OS_SHIPPING');
+        if ($idShipped && !in_array($idShipped, $delivered, true) && !in_array($idShipped, $blocked, true) && !in_array($idShipped, $shipped, true)) {
+            $shipped[] = $idShipped;
+        }
+
+        // Exclusivité : bloquant > livré > expédié.
+        $delivered = array_values(array_diff($delivered, $blocked));
+        $shipped = array_values(array_diff($shipped, $blocked, $delivered));
+
+        return ['DELIVERED' => $delivered, 'SHIPPED' => $shipped, 'BLOCKED' => $blocked];
+    }
+
+    protected static function nameMatches($haystackLower, array $needles)
+    {
+        foreach ($needles as $n) {
+            if ($n !== '' && strpos($haystackLower, $n) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Liste d'IDs d'états mappés sur un rôle (clé de configuration CSV).
+     *
+     * @return int[]
+     */
+    public static function getMappedStates($configKey)
+    {
+        return array_values(array_filter(array_map('intval', explode(',', (string) Configuration::get($configKey)))));
+    }
+
+    /**
+     * États bloquants : les 3 états natifs (annulé / remboursé / erreur) +
+     * ceux mappés manuellement par le marchand (onglet "Mapping des statuts").
+     *
+     * @return int[]
+     */
+    public static function getBlockedStates()
+    {
+        $default = array_filter([
+            (int) Configuration::get('PS_OS_CANCELED'),
+            (int) Configuration::get('PS_OS_REFUND'),
+            (int) Configuration::get('PS_OS_ERROR'),
+        ]);
+
+        return array_values(array_unique(array_merge($default, self::getMappedStates('RETRACTATION_BLOCKED_STATES'))));
+    }
+
+    /**
+     * Date de livraison effective servant de départ au délai de 14 jours :
+     *  1) la date native delivery_date (référence légale), si présente ;
+     *  2) sinon, la date d'entrée dans un état mappé "Livré" (order_history),
+     *     pour les boutiques dont l'état "livré" n'a pas le drapeau natif.
+     *
+     * @return string|null date Y-m-d H:i:s ou null si non livrée
+     */
+    public static function getEffectiveDeliveryDate(Order $order)
+    {
+        if (self::isRealDeliveryDate($order->delivery_date)) {
+            return $order->delivery_date;
+        }
+
+        $deliveredStates = self::getMappedStates('RETRACTATION_DELIVERED_STATES');
+        if ($deliveredStates) {
+            $date = Db::getInstance()->getValue(
+                'SELECT MIN(`date_add`) FROM `' . _DB_PREFIX_ . 'order_history`
+                 WHERE `id_order` = ' . (int) $order->id . '
+                   AND `id_order_state` IN (' . implode(',', array_map('intval', $deliveredStates)) . ')'
+            );
+            if (self::isRealDeliveryDate($date)) {
+                return $date;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * La commande est-elle expédiée / en cours d'acheminement (mais pas
+     * encore livrée) ? Détection par les états mappés "Expédié" ET par le
+     * drapeau natif `shipped` rencontré dans l'historique de la commande.
+     */
+    public static function isShipped(Order $order)
+    {
+        $shippedStates = self::getMappedStates('RETRACTATION_SHIPPED_STATES');
+        $conditions = ['os.`shipped` = 1'];
+        if ($shippedStates) {
+            $conditions[] = 'oh.`id_order_state` IN (' . implode(',', array_map('intval', $shippedStates)) . ')';
+        }
+
+        $count = (int) Db::getInstance()->getValue(
+            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'order_history` oh
+             INNER JOIN `' . _DB_PREFIX_ . 'order_state` os ON os.`id_order_state` = oh.`id_order_state`
+             WHERE oh.`id_order` = ' . (int) $order->id . ' AND (' . implode(' OR ', $conditions) . ')'
+        );
+
+        return $count > 0;
+    }
+
+    /**
+     * Phase logistique au sens du module : 'delivered' (délai 14 j en cours),
+     * 'shipped' (colis parti, non encore livré) ou 'pending' (non expédié).
+     */
+    public static function getShippingPhase(Order $order)
+    {
+        if (self::getEffectiveDeliveryDate($order)) {
+            return 'delivered';
+        }
+
+        return self::isShipped($order) ? 'shipped' : 'pending';
+    }
+
+    /**
      * Éligibilité d'une commande au bouton "Se rétracter".
      *
      * Le bouton est affiché uniquement pendant la fenêtre légale et tant
      * qu'il reste des quantités rétractables ; la vérification fine
      * (exclusions L221-28, état du produit…) reste à la main du SAV.
      *
-     * @return array{eligible: bool, delivered: bool, deadline: ?DateTime, deadline_text: string, reason: string, excluded_products: array, remaining: array}
+     * @return array{eligible: bool, delivered: bool, delivery_date: ?string, deadline: ?DateTime, deadline_text: string, reason: string, excluded_products: array, remaining: array}
      */
     public static function getOrderEligibility(Order $order)
     {
         $result = [
             'eligible' => false,
             'delivered' => false,
+            'delivery_date' => null,
+            'shipping_phase' => 'pending',
             'deadline' => null,
             'deadline_text' => '',
             'reason' => '',
@@ -231,14 +447,9 @@ class RetractationRequest extends ObjectModel
             return $result;
         }
 
-        // Commande annulée, remboursée ou en erreur de paiement : pas de bouton.
+        // États bloquants (annulé / remboursé / erreur + mapping marchand) : pas de bouton.
         $currentState = (int) $order->getCurrentState();
-        $blockedStates = array_filter([
-            (int) Configuration::get('PS_OS_CANCELED'),
-            (int) Configuration::get('PS_OS_REFUND'),
-            (int) Configuration::get('PS_OS_ERROR'),
-        ]);
-        if (in_array($currentState, $blockedStates, true)) {
+        if (in_array($currentState, self::getBlockedStates(), true)) {
             $result['reason'] = 'order_state';
 
             return $result;
@@ -264,11 +475,14 @@ class RetractationRequest extends ObjectModel
             return $result;
         }
 
-        $delivered = self::isRealDeliveryDate($order->delivery_date);
+        $deliveryDate = self::getEffectiveDeliveryDate($order);
+        $delivered = (bool) $deliveryDate;
         $result['delivered'] = $delivered;
+        $result['delivery_date'] = $deliveryDate;
+        $result['shipping_phase'] = $delivered ? 'delivered' : (self::isShipped($order) ? 'shipped' : 'pending');
 
         if ($delivered) {
-            $deadline = RetractationDelai::getDeadline($order->delivery_date);
+            $deadline = RetractationDelai::getDeadline($deliveryDate);
             $result['deadline'] = $deadline;
             $result['deadline_text'] = sprintf(
                 Context::getContext()->getTranslator()->trans('jusqu\'au %s inclus', [], 'Modules.Retractationcommande.Shop'),

@@ -689,10 +689,55 @@
       </tr>
     </table>
     <p>
-      Sous le formulaire, un panneau fournit la <strong>clause CGV bilingue (FR/EN) prête à copier</strong>,
-      générée avec votre libellé de lien, votre délai et l'URL de la page de rétractation — à insérer dans
-      vos CGV (obligation d'information de l'ordonnance ; à adapter si certains produits relèvent des
-      exceptions de l'art. L221-28).
+      La configuration est organisée en trois onglets : <strong>Configuration</strong> (ci-dessus),
+      <strong>Mapping des statuts</strong> et <strong>Clause CGV</strong> (clause prête à copier, une
+      version par langue installée — obligation d'information de l'ordonnance, à adapter si certains
+      produits relèvent des exceptions de l'art. L221-28).
+    </p>
+
+    <h3>Onglet « Mapping des statuts »</h3>
+    <p>
+      Une matrice associe chaque statut de commande de votre boutique à un rôle, pour coller exactement
+      à votre workflow (transporteurs, paiement à la livraison, états maison) :
+    </p>
+    <table>
+      <tr><th style="width:28%">Rôle</th><th>Effet</th></tr>
+      <tr>
+        <td><span class="badge vert">Livré</span></td>
+        <td>Fait <strong>démarrer le délai légal de 14 jours</strong>, en complément du drapeau natif
+          PrestaShop. Si la commande est passée par un état mappé « Livré », le décompte part de la date
+          d'entrée dans cet état (<code>order_history</code>).</td>
+      </tr>
+      <tr>
+        <td><span class="badge bleu">Expédié (en cours d'acheminement)</span></td>
+        <td>Colis parti mais <strong>pas encore livré</strong>. Le client est invité à <strong>refuser le
+          colis</strong> à sa présentation ou à le renvoyer ; les messages (modal, PDF, emails, SAV) sont
+          adaptés en conséquence. Le délai de 14 jours ne démarre qu'à la livraison.</td>
+      </tr>
+      <tr>
+        <td><span class="badge rouge">Bloquant</span></td>
+        <td>Masque le bouton de rétractation, <strong>en plus</strong> des états annulé / remboursé /
+          erreur (toujours bloquants par défaut).</td>
+      </tr>
+    </table>
+    <p>
+      Le module distingue ainsi <strong>trois situations</strong> et adapte tout le parcours : commande
+      <strong>non expédiée</strong> (annulation pure, rien à renvoyer), <strong>en transit</strong> (refus
+      de colis ou retour), <strong>livrée</strong> (retour produit, délai en cours). La phase est figée au
+      moment du dépôt et affichée au SAV.
+    </p>
+    <div class="encart succes">
+      <strong>Remplissage automatique intelligent.</strong>
+      Le bouton détecte chaque statut réel via ses <em>drapeaux</em> PrestaShop (<code>shipped</code>,
+      <code>delivery</code>, <code>paid</code>) <em>et</em> des mots-clés multilingues de son nom
+      (livré / delivered / expédié / shipped / annulé / remboursé / cancel…). Contrairement à un preset d'IDs en dur, il
+      cible vos statuts personnalisés, quelle que soit leur numérotation. Le mapping est d'ailleurs
+      pré-rempli par cette détection dès l'installation — le module fonctionne sans réglage manuel.
+    </div>
+    <p>
+      La matrice affiche pour chaque statut sa pastille de couleur, son ID, son nombre de commandes sur
+      12 mois et ses drapeaux ; recherche, résumé en direct et détection de conflits (un statut ne peut
+      être à la fois « Livré » et « Bloquant ») sont inclus.
     </p>
   </section>
 

@@ -30,8 +30,10 @@
 
 <h3 style="font-size: 11pt;">{l s='La suite de votre demande' mod='retractationcommande'}</h3>
 <p style="font-size: 9.5pt;">
-  {if $rc_is_delivered}
+  {if $rc_phase == 'delivered'}
     {l s='Notre service client vérifie votre demande puis vous adresse la procédure de retour par email. Merci de ne pas renvoyer le(s) produit(s) avant de l\'avoir reçue, et de retourner les biens complets, dans leur état d\'origine.' mod='retractationcommande'}
+  {elseif $rc_phase == 'shipped'}
+    {l s='Commande déjà expédiée : vous pouvez refuser le colis à sa présentation. Si vous le recevez, ne l\'ouvrez pas et suivez la procédure de retour que notre service client vous transmettra. Retournez les biens complets, dans leur état d\'origine.' mod='retractationcommande'}
   {else}
     {l s='Commande non expédiée : aucun retour de produit ne sera nécessaire. Notre service client vérifie votre demande, annule l\'expédition et procède au remboursement.' mod='retractationcommande'}
   {/if}

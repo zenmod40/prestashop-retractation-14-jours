@@ -16,6 +16,14 @@
       <h4>Demande</h4>
       <table class="table">
         <tr><td><strong>Déposée le</strong></td><td>{$rc_request->date_add}</td></tr>
+        <tr>
+          <td><strong>Phase logistique (au dépôt)</strong></td>
+          <td>
+            {if $rc_request->shipping_phase == 'delivered'}<span class="badge badge-success">Livrée</span>
+            {elseif $rc_request->shipping_phase == 'shipped'}<span class="badge badge-info">Expédiée (en cours d'acheminement)</span>
+            {else}<span class="badge badge-warning">Non expédiée</span>{/if}
+          </td>
+        </tr>
         <tr><td><strong>Date de livraison constatée</strong></td><td>{if $rc_request->delivery_date}{$rc_request->delivery_date}{else}<em>non livrée au moment de la demande</em>{/if}</td></tr>
         <tr>
           <td><strong>Date limite légale</strong></td>
@@ -125,14 +133,16 @@
         <form method="post" action="{$rc_current_index}">
           <button type="submit" name="submitAcceptRetractation" class="btn btn-success">
             <i class="icon-check"></i>
-            {if $rc_request->delivery_date}
-              Conforme — envoyer la procédure de retour
-            {else}
+            {if $rc_request->shipping_phase == 'pending'}
               Conforme — annulation avant expédition (aucun retour)
+            {else}
+              Conforme — envoyer la procédure de retour
             {/if}
           </button>
-          {if !$rc_request->delivery_date}
+          {if $rc_request->shipping_phase == 'pending'}
             <p class="help-block">Commande non expédiée au moment de la demande : le client sera informé de l'annulation, aucun retour de produit ne sera demandé. Pensez à bloquer l'expédition et à rembourser depuis la fiche commande.</p>
+          {elseif $rc_request->shipping_phase == 'shipped'}
+            <p class="help-block">Commande en cours d'acheminement au moment de la demande : le client peut refuser le colis ou le renvoyer. La procédure de retour lui sera envoyée. Le délai de 14 jours ne démarre qu'à la livraison.</p>
           {/if}
         </form>
       </div>

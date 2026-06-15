@@ -117,8 +117,10 @@
   </div>
 
   <p class="retractation-legal">
-    {if $rc_delivery_date}
+    {if $rc_phase == 'delivered'}
       {l s='En confirmant, votre demande de rétractation est transmise à notre service client et un accusé de réception vous est adressé par email avec un exemplaire PDF (art. L221-21 du Code de la consommation). Après vérification de l\'éligibilité (délai légal, exclusions de l\'art. L221-28), la procédure de retour vous sera communiquée — merci de ne pas renvoyer les produits avant de l\'avoir reçue. Le remboursement intervient au plus tard 14 jours après récupération du bien ou réception de la preuve d\'expédition (frais de livraison inclus en cas de rétractation totale, au prorata sinon). Les frais de renvoi restent à votre charge.' mod='retractationcommande'}
+    {elseif $rc_phase == 'shipped'}
+      {l s='En confirmant, votre demande de rétractation est transmise à notre service client et un accusé de réception vous est adressé par email avec un exemplaire PDF (art. L221-21 du Code de la consommation). Votre commande étant déjà expédiée, vous pouvez refuser le colis à sa présentation ; si vous le recevez, ne l\'ouvrez pas et suivez la procédure de retour que notre service client vous transmettra. Le remboursement intervient au plus tard 14 jours après récupération du bien ou réception de la preuve de son renvoi. Les frais de renvoi restent à votre charge.' mod='retractationcommande'}
     {else}
       {l s='En confirmant, votre demande de rétractation est transmise à notre service client et un accusé de réception vous est adressé par email avec un exemplaire PDF (art. L221-21 du Code de la consommation). Votre commande n\'ayant pas encore été expédiée, aucun retour de produit ne sera nécessaire : après vérification (exclusions de l\'art. L221-28), l\'expédition sera annulée et la totalité des sommes versées vous sera remboursée au plus tard 14 jours après votre demande, par le même moyen de paiement.' mod='retractationcommande'}
     {/if}

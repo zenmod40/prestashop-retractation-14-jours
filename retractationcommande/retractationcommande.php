@@ -38,7 +38,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.3.0';
+        $this->version = '1.3.1';
         $this->author = 'Magic Garden';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -70,7 +70,23 @@ class RetractationCommande extends Module
             && Configuration::updateValue('RETRACTATION_LINK_LABEL', 'Exercer mon droit de rétractation')
             && Configuration::updateValue('RETRACTATION_EXCLUDED_CATS', '')
             && Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', '')
-            && Configuration::updateValue('RETRACTATION_PROCEDURE_TEXT', $this->getDefaultProcedureText(), true);
+            && Configuration::updateValue('RETRACTATION_PROCEDURE_TEXT', $this->getDefaultProcedureText(), true)
+            && $this->installDefaultStateMapping();
+    }
+
+    /**
+     * Pré-remplit le mapping des statuts par détection automatique
+     * (drapeaux natifs + mots-clés) dès l'installation : le module est
+     * opérationnel sans configuration manuelle.
+     */
+    protected function installDefaultStateMapping()
+    {
+        $map = RetractationRequest::suggestStateMapping();
+        Configuration::updateValue('RETRACTATION_DELIVERED_STATES', implode(',', $map['DELIVERED']));
+        Configuration::updateValue('RETRACTATION_SHIPPED_STATES', implode(',', $map['SHIPPED']));
+        Configuration::updateValue('RETRACTATION_BLOCKED_STATES', implode(',', $map['BLOCKED']));
+
+        return true;
     }
 
     public function uninstall()
@@ -78,7 +94,7 @@ class RetractationCommande extends Module
         foreach ([
             'RETRACTATION_SAV_EMAIL', 'RETRACTATION_CREATE_ORDER_RETURN', 'RETRACTATION_ALLOW_UNDELIVERED',
             'RETRACTATION_HIDE_NATIVE_FORM', 'RETRACTATION_DELAY_DAYS', 'RETRACTATION_LINK_LABEL',
-            'RETRACTATION_SHOW_FOOTER_LINK',
+            'RETRACTATION_SHOW_FOOTER_LINK', 'RETRACTATION_DELIVERED_STATES', 'RETRACTATION_SHIPPED_STATES', 'RETRACTATION_BLOCKED_STATES',
             'RETRACTATION_EXCLUDED_CATS', 'RETRACTATION_EXCLUDED_PRODUCTS', 'RETRACTATION_PROCEDURE_TEXT',
         ] as $key) {
             Configuration::deleteByName($key);
@@ -111,6 +127,7 @@ class RetractationCommande extends Module
                 `refusal_reason` TEXT,
                 `products_snapshot` TEXT,
                 `delivery_date` DATETIME DEFAULT NULL,
+                `shipping_phase` VARCHAR(16) NOT NULL DEFAULT \'pending\',
                 `legal_deadline` DATETIME DEFAULT NULL,
                 `within_deadline` TINYINT(1) NOT NULL DEFAULT 1,
                 `pdf_filename` VARCHAR(255) DEFAULT NULL,
@@ -135,6 +152,7 @@ class RetractationCommande extends Module
         $migrations = [
             'reference' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `reference` VARCHAR(16) NOT NULL DEFAULT \'\' AFTER `id_order_return`',
             'products_snapshot' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `products_snapshot` TEXT AFTER `refusal_reason`',
+            'shipping_phase' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `shipping_phase` VARCHAR(16) NOT NULL DEFAULT \'pending\' AFTER `delivery_date`',
         ];
         foreach ($migrations as $column => $sql) {
             if (!in_array($column, $existing, true) && !Db::getInstance()->execute($sql)) {
@@ -357,7 +375,195 @@ class RetractationCommande extends Module
             }
         }
 
-        return $output . $this->renderConfigForm() . $this->renderCgvPanel() . $this->renderCredits();
+        if (Tools::isSubmit('submitRetractationMapping')) {
+            $delivered = array_map('intval', (array) Tools::getValue('RETRACTATION_DELIVERED_STATES', []));
+            $shipped = array_map('intval', (array) Tools::getValue('RETRACTATION_SHIPPED_STATES', []));
+            $blocked = array_map('intval', (array) Tools::getValue('RETRACTATION_BLOCKED_STATES', []));
+            // Exclusivité : bloquant > livré > expédié.
+            $delivered = array_values(array_diff($delivered, $blocked));
+            $shipped = array_values(array_diff($shipped, $blocked, $delivered));
+            Configuration::updateValue('RETRACTATION_DELIVERED_STATES', implode(',', $delivered));
+            Configuration::updateValue('RETRACTATION_SHIPPED_STATES', implode(',', $shipped));
+            Configuration::updateValue('RETRACTATION_BLOCKED_STATES', implode(',', $blocked));
+            $output .= $this->displayConfirmation($this->l('Mapping des statuts enregistré.'));
+        }
+
+        $activeTab = Tools::isSubmit('submitRetractationMapping') ? 'rc-tab-mapping' : 'rc-tab-config';
+
+        return $output . $this->renderTabs($activeTab);
+    }
+
+    /**
+     * Onglet "Mapping des statuts" : matrice interactive (un statut par ligne,
+     * deux rôles en colonnes) + remplissage automatique dynamique.
+     */
+    protected function renderMappingTab()
+    {
+        $states = RetractationRequest::getOrderStatesWithMeta();
+        $deliveredSel = RetractationRequest::getMappedStates('RETRACTATION_DELIVERED_STATES');
+        $shippedSel = RetractationRequest::getMappedStates('RETRACTATION_SHIPPED_STATES');
+        $blockedSel = RetractationRequest::getMappedStates('RETRACTATION_BLOCKED_STATES');
+        $suggestion = RetractationRequest::suggestStateMapping();
+
+        $roles = [
+            'DELIVERED' => ['label' => $this->l('Livré (démarre le délai 14 j)'), 'sel' => $deliveredSel],
+            'SHIPPED' => ['label' => $this->l('Expédié (en cours d\'acheminement)'), 'sel' => $shippedSel],
+            'BLOCKED' => ['label' => $this->l('Bloquant (aucune rétractation)'), 'sel' => $blockedSel],
+        ];
+
+        $action = AdminController::$currentIndex . '&configure=' . $this->name . '&token=' . Tools::getAdminTokenLite('AdminModules');
+
+        $html = '<form method="post" action="' . $action . '" id="rc-mapping-form">';
+        $html .= '<div class="alert alert-info">'
+            . $this->l('Associez chaque statut de commande à un rôle. « Livré » fait démarrer le délai légal de 14 jours (en complément du drapeau natif de PrestaShop) ; « Bloquant » masque le bouton de rétractation (en plus des états annulé / remboursé / erreur, toujours bloquants). Le remplissage automatique analyse les drapeaux et le nom de chaque statut.')
+            . '</div>';
+
+        $html .= '<div class="rc-map-toolbar">'
+            . '<button type="button" class="btn btn-default" id="rc-map-auto"><i class="icon-magic"></i> ' . $this->l('Remplissage automatique') . '</button> '
+            . '<button type="button" class="btn btn-default" id="rc-map-reset"><i class="icon-eraser"></i> ' . $this->l('Tout décocher') . '</button> '
+            . '<input type="text" id="rc-map-search" class="rc-map-search" placeholder="' . $this->l('Filtrer par nom ou ID…') . '"> '
+            . '<span id="rc-map-summary" class="rc-map-summary"></span>'
+            . '</div>';
+
+        $html .= '<table class="table rc-map-table"><thead><tr><th>' . $this->l('Statut de commande') . '</th>';
+        foreach ($roles as $r) {
+            $html .= '<th class="rc-map-col">' . $r['label'] . '</th>';
+        }
+        $html .= '</tr></thead><tbody>';
+
+        foreach ($states as $s) {
+            $id = (int) $s['id_state'];
+            $flags = [];
+            if ($s['paid']) { $flags[] = 'paid'; }
+            if ($s['shipped']) { $flags[] = 'shipped'; }
+            if ($s['delivery']) { $flags[] = 'delivery'; }
+            $flagsTxt = $flags ? '<span class="rc-map-flags">' . implode(' · ', $flags) . '</span>' : '';
+
+            $html .= '<tr data-search="' . $id . ' ' . Tools::strtolower(htmlspecialchars($s['name'])) . '">'
+                . '<td class="rc-map-state">'
+                . '<span class="rc-map-dot" style="background:' . htmlspecialchars($s['color']) . '"></span>'
+                . '<span class="rc-map-id">#' . $id . '</span> '
+                . htmlspecialchars($s['name'])
+                . ' <span class="rc-map-count" title="' . $this->l('commandes sur 12 mois') . '">' . (int) $s['count'] . '</span>'
+                . $flagsTxt
+                . '</td>';
+            foreach ($roles as $key => $r) {
+                $checked = in_array($id, $r['sel'], true) ? ' rc-on' : '';
+                $html .= '<td class="rc-map-col">'
+                    . '<button type="button" class="rc-map-cell' . $checked . '" data-role="' . $key . '" data-state="' . $id . '"><i class="icon-check"></i></button>'
+                    . '<input type="checkbox" class="rc-map-cb" name="RETRACTATION_' . $key . '_STATES[]" value="' . $id . '"' . ($checked ? ' checked' : '') . ' style="display:none" data-role="' . $key . '" data-state="' . $id . '">'
+                    . '</td>';
+            }
+            $html .= '</tr>';
+        }
+        $html .= '</tbody></table>';
+
+        $html .= '<div class="panel-footer"><button type="submit" name="submitRetractationMapping" class="btn btn-default pull-right">'
+            . '<i class="process-icon-save"></i> ' . $this->l('Enregistrer') . '</button></div>';
+        $html .= '</form>';
+
+        // Suggestion dynamique exposée au JS pour le bouton "Remplissage automatique".
+        $html .= '<script type="text/javascript">var rcMapSuggestion = ' . json_encode($suggestion) . ';</script>';
+        $html .= $this->renderMappingAssets();
+
+        return $html;
+    }
+
+    /**
+     * Styles + comportement JS de la matrice de mapping (autonomes, BO).
+     */
+    protected function renderMappingAssets()
+    {
+        $txtSummary = $this->l('%mapped% statut(s) mappé(s), %ignored% ignoré(s)');
+        $txtConflict = $this->l('%n% conflit(s) : un statut ne peut appartenir qu\'à un seul rôle.');
+
+        return '
+<style>
+.rc-map-toolbar{margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rc-map-search{height:32px;border:1px solid #ccc;border-radius:4px;padding:0 10px;min-width:220px}
+.rc-map-summary{color:#555;font-size:13px;margin-left:auto}
+.rc-map-summary .rc-map-conflict{color:#c0392b;font-weight:bold}
+.rc-map-table td,.rc-map-table th{vertical-align:middle!important}
+.rc-map-col{text-align:center;width:170px}
+.rc-map-state{font-size:13px}
+.rc-map-dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:middle;border:1px solid rgba(0,0,0,.15)}
+.rc-map-id{color:#888;font-weight:600;margin-right:2px}
+.rc-map-count{display:inline-block;background:#eef;color:#46a;border-radius:10px;padding:0 8px;font-size:11px;margin-left:6px}
+.rc-map-flags{display:inline-block;margin-left:8px;font-size:11px;color:#999}
+.rc-map-cell{width:34px;height:34px;border:1px solid #ccd;border-radius:6px;background:#fff;color:transparent;cursor:pointer;transition:all .12s}
+.rc-map-cell:hover{border-color:#2e7d32}
+.rc-map-cell.rc-on{background:#2e7d32;border-color:#2e7d32;color:#fff}
+.rc-map-cell.rc-on[data-role=SHIPPED]{background:#1565c0;border-color:#1565c0}
+.rc-map-cell.rc-on[data-role=BLOCKED]{background:#c0392b;border-color:#c0392b}
+.rc-map-cell.rc-conflict{box-shadow:0 0 0 3px #e67e22}
+</style>
+<script type="text/javascript">
+(function(){
+  var form=document.getElementById("rc-mapping-form");
+  if(!form)return;
+  function cells(){return form.querySelectorAll(".rc-map-cell");}
+  function setCell(btn,on){btn.classList.toggle("rc-on",on);var cb=btn.parentNode.querySelector(".rc-map-cb");if(cb)cb.checked=on;}
+  function summary(){
+    var rows=form.querySelectorAll("tbody tr"),mapped=0,ignored=0,conflicts=0;
+    rows.forEach(function(r){
+      var on=r.querySelectorAll(".rc-map-cell.rc-on");
+      r.querySelectorAll(".rc-map-cell").forEach(function(c){c.classList.remove("rc-conflict")});
+      // Un statut ne doit appartenir qu\'a un seul role.
+      if(on.length>1){conflicts++;on.forEach(function(c){c.classList.add("rc-conflict")});}
+      if(on.length===0)ignored++;else mapped++;
+    });
+    var s=' . json_encode($txtSummary) . '.replace("%mapped%",mapped).replace("%ignored%",ignored);
+    if(conflicts>0)s+=" — <span class=\"rc-map-conflict\">"+' . json_encode($txtConflict) . '.replace("%n%",conflicts)+"</span>";
+    var el=document.getElementById("rc-map-summary");if(el)el.innerHTML=s;
+  }
+  form.addEventListener("click",function(e){
+    var btn=e.target.closest(".rc-map-cell");if(!btn)return;
+    e.preventDefault();setCell(btn,!btn.classList.contains("rc-on"));summary();
+  });
+  var auto=document.getElementById("rc-map-auto");
+  if(auto)auto.addEventListener("click",function(){
+    if(typeof rcMapSuggestion==="undefined")return;
+    cells().forEach(function(btn){
+      var role=btn.dataset.role,sid=parseInt(btn.dataset.state,10);
+      var on=(rcMapSuggestion[role]||[]).indexOf(sid)>-1;setCell(btn,on);
+    });summary();
+  });
+  var reset=document.getElementById("rc-map-reset");
+  if(reset)reset.addEventListener("click",function(){cells().forEach(function(b){setCell(b,false)});summary();});
+  var search=document.getElementById("rc-map-search");
+  if(search)search.addEventListener("input",function(){
+    var q=this.value.toLowerCase().trim();
+    form.querySelectorAll("tbody tr").forEach(function(r){
+      r.style.display=(!q||(r.dataset.search||"").indexOf(q)>-1)?"":"none";
+    });
+  });
+  summary();
+})();
+</script>';
+    }
+
+    /**
+     * Conteneur à onglets : Configuration · Mapping des statuts · Clause CGV.
+     */
+    protected function renderTabs($activeTab = 'rc-tab-config')
+    {
+        $tabs = [
+            ['id' => 'rc-tab-config', 'label' => $this->l('Configuration'), 'icon' => 'icon-cogs', 'content' => $this->renderConfigForm()],
+            ['id' => 'rc-tab-mapping', 'label' => $this->l('Mapping des statuts'), 'icon' => 'icon-sitemap', 'content' => $this->renderMappingTab()],
+            ['id' => 'rc-tab-cgv', 'label' => $this->l('Clause CGV'), 'icon' => 'icon-file-text', 'content' => $this->renderCgvPanel()],
+        ];
+
+        $nav = '<ul class="nav nav-tabs" id="rc-config-tabs">';
+        $panes = '<div class="tab-content" style="padding-top:15px;">';
+        foreach ($tabs as $t) {
+            $active = $t['id'] === $activeTab ? ' active' : '';
+            $nav .= '<li class="' . trim($active) . '"><a href="#' . $t['id'] . '" data-toggle="tab"><i class="' . $t['icon'] . '"></i> ' . $t['label'] . '</a></li>';
+            $panes .= '<div class="tab-pane' . $active . '" id="' . $t['id'] . '">' . $t['content'] . '</div>';
+        }
+        $nav .= '</ul>';
+        $panes .= '</div>';
+
+        return '<div class="panel">' . $nav . $panes . '</div>' . $this->renderCredits();
     }
 
     /**

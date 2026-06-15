@@ -117,8 +117,10 @@
 
 <h3 style="font-size: 11pt;">{l s='Suite de la procédure' mod='retractationcommande'}</h3>
 <p style="font-size: 9.5pt;">
-  {if $rc_is_delivered}
+  {if $rc_phase == 'delivered'}
     {l s='Votre demande va être vérifiée par notre service client (respect du délai légal, exclusions prévues à l\'article L221-28 du Code de la consommation). Si elle est conforme, la procédure de retour vous sera transmise par email. Merci de ne pas renvoyer le(s) produit(s) avant de l\'avoir reçue. Le remboursement interviendra au plus tard 14 jours après récupération du bien ou réception de la preuve d\'expédition, par le même moyen de paiement que celui utilisé lors de la commande (art. L221-24). Les frais directs de renvoi restent à votre charge (art. L221-23).' mod='retractationcommande'}
+  {elseif $rc_phase == 'shipped'}
+    {l s='Votre commande étant déjà expédiée au moment de votre demande, vous pouvez refuser le colis à sa présentation ou, si vous le recevez, suivre la procédure de retour que notre service client vous transmettra après vérification (exclusions prévues à l\'article L221-28 du Code de la consommation). Le remboursement interviendra au plus tard 14 jours après récupération du bien ou réception de la preuve de son renvoi, par le même moyen de paiement que celui utilisé lors de la commande (art. L221-24). Les frais directs de renvoi restent à votre charge (art. L221-23).' mod='retractationcommande'}
   {else}
     {l s='Votre commande n\'ayant pas encore été expédiée au moment de votre demande, aucun retour de produit ne sera nécessaire. Après vérification par notre service client (exclusions prévues à l\'article L221-28 du Code de la consommation), l\'expédition sera annulée et la totalité des sommes versées vous sera remboursée au plus tard 14 jours après votre demande, par le même moyen de paiement que celui utilisé lors de la commande (art. L221-24).' mod='retractationcommande'}
   {/if}

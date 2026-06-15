@@ -115,7 +115,8 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
         $this->context->smarty->assign([
             'rc_order' => $order,
             'rc_order_date' => Tools::displayDate($order->date_add),
-            'rc_delivery_date' => $eligibility['delivered'] ? Tools::displayDate($order->delivery_date) : null,
+            'rc_delivery_date' => $eligibility['delivered'] ? Tools::displayDate($eligibility['delivery_date']) : null,
+            'rc_phase' => $eligibility['shipping_phase'],
             'rc_deadline_text' => $eligibility['deadline_text'],
             'rc_products' => $this->getReturnableProducts($order, $eligibility['remaining']),
             'rc_customer' => $customer,
@@ -196,6 +197,7 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
         }
 
         $delivered = $eligibility['delivered'];
+        $phase = $eligibility['shipping_phase']; // delivered | shipped | pending
         $deadline = $eligibility['deadline'];
 
         $request = new RetractationRequest();
@@ -206,7 +208,8 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
         $request->status = RetractationRequest::STATUS_PENDING;
         $request->message = $message ?: null;
         $request->products_snapshot = json_encode($selectedProducts, JSON_UNESCAPED_UNICODE);
-        $request->delivery_date = $delivered ? $order->delivery_date : null;
+        $request->delivery_date = $delivered ? $eligibility['delivery_date'] : null;
+        $request->shipping_phase = $phase;
         $request->legal_deadline = $deadline ? $deadline->format('Y-m-d H:i:s') : null;
         $request->within_deadline = 1; // bouton visible => dépôt dans la fenêtre légale
 
@@ -232,9 +235,13 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
 
         $this->sendEmails($order, $request, $pdfFilename, $selectedProducts);
 
-        $successMessage = $delivered
-            ? $this->module->l('Votre rétractation a bien été enregistrée sous la référence %s. Un accusé de réception vous a été envoyé par email. Notre service client va vérifier votre demande et vous transmettre la procédure de retour.', 'demande')
-            : $this->module->l('Votre rétractation a bien été enregistrée sous la référence %s. Un accusé de réception vous a été envoyé par email. Votre commande n\'ayant pas encore été expédiée, aucun retour de produit ne sera nécessaire : après vérification, l\'expédition sera annulée et vous serez remboursé(e).', 'demande');
+        if ($phase === 'delivered') {
+            $successMessage = $this->module->l('Votre rétractation a bien été enregistrée sous la référence %s. Un accusé de réception vous a été envoyé par email. Notre service client va vérifier votre demande et vous transmettre la procédure de retour.', 'demande');
+        } elseif ($phase === 'shipped') {
+            $successMessage = $this->module->l('Votre rétractation a bien été enregistrée sous la référence %s. Un accusé de réception vous a été envoyé par email. Votre commande étant déjà expédiée, vous pouvez refuser le colis à sa présentation ou, si vous le recevez, suivre la procédure de retour que notre service client va vous transmettre.', 'demande');
+        } else {
+            $successMessage = $this->module->l('Votre rétractation a bien été enregistrée sous la référence %s. Un accusé de réception vous a été envoyé par email. Votre commande n\'ayant pas encore été expédiée, aucun retour de produit ne sera nécessaire : après vérification, l\'expédition sera annulée et vous serez remboursé(e).', 'demande');
+        }
 
         header('Content-Type: application/json');
         die(json_encode([
@@ -301,6 +308,7 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             'rc_request_ref' => $request->reference,
             'rc_request_date' => Tools::displayDate(date('Y-m-d H:i:s'), null, true),
             'rc_is_delivered' => (bool) $eligibility['delivered'],
+            'rc_phase' => $eligibility['shipping_phase'],
             'rc_is_full_order' => $isFullOrder,
             'rc_products_total' => RetractationRequest::formatPrice($productsTotal, $currency),
             'rc_shipping_total' => RetractationRequest::formatPrice($shipping, $currency),
@@ -308,7 +316,7 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             'rc_currency' => $currency,
             'rc_order' => $order,
             'rc_order_date' => Tools::displayDate($order->date_add),
-            'rc_delivery_date' => $eligibility['delivered'] ? Tools::displayDate($order->delivery_date) : null,
+            'rc_delivery_date' => $eligibility['delivered'] ? Tools::displayDate($eligibility['delivery_date']) : null,
             'rc_products' => $selectedProducts,
             'rc_customer' => $this->getOrderCustomer($order),
             'rc_address' => $address,
@@ -345,16 +353,20 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             $productLines[] = $product['product_quantity'] . ' x ' . $product['product_name'];
         }
 
-        // Textes adaptés : commande livrée => procédure de retour ;
-        // non expédiée => annulation avant expédition, aucun retour à faire.
-        $delivered = (bool) $request->delivery_date;
-        $nextSteps = $delivered
-            ? $this->module->l('Notre service client va vérifier l\'éligibilité de votre demande (délai légal de 14 jours, exclusions de l\'article L221-28). Si elle est conforme, la procédure de retour vous sera transmise par email, puis le remboursement interviendra au plus tard 14 jours après récupération du bien ou réception de la preuve d\'expédition. Merci de ne pas renvoyer le produit avant d\'avoir reçu la procédure de retour.', 'demande')
-            : $this->module->l('Votre commande n\'ayant pas encore été expédiée, aucun retour de produit ne sera nécessaire. Après vérification de votre demande par notre service client, l\'expédition sera annulée et la totalité des sommes versées vous sera remboursée au plus tard 14 jours après votre demande, par le même moyen de paiement (art. L221-24).', 'demande');
-
-        $savChecklist = $delivered
-            ? $this->module->l('À vérifier : délai de 14 jours, exclusions légales (art. L221-28), produits déjà retournés.', 'demande')
-            : $this->module->l('COMMANDE NON EXPÉDIÉE — annulation avant expédition : aucun retour produit attendu. À vérifier : exclusions légales (art. L221-28). Pensez à bloquer l\'expédition avant validation.', 'demande');
+        // Textes adaptés aux 3 phases : livré (retour produit), expédié
+        // (colis en transit : refus/retour), non expédié (annulation).
+        $phase = $request->shipping_phase ?: ((bool) $request->delivery_date ? 'delivered' : 'pending');
+        if ($phase === 'delivered') {
+            $nextSteps = $this->module->l('Notre service client va vérifier l\'éligibilité de votre demande (délai légal de 14 jours, exclusions de l\'article L221-28). Si elle est conforme, la procédure de retour vous sera transmise par email, puis le remboursement interviendra au plus tard 14 jours après récupération du bien ou réception de la preuve d\'expédition. Merci de ne pas renvoyer le produit avant d\'avoir reçu la procédure de retour.', 'demande');
+            $savChecklist = $this->module->l('À vérifier : délai de 14 jours, exclusions légales (art. L221-28), produits déjà retournés.', 'demande');
+        } elseif ($phase === 'shipped') {
+            $nextSteps = $this->module->l('Votre commande est déjà expédiée et en cours d\'acheminement. Vous pouvez refuser le colis à sa présentation ; si vous le recevez, ne l\'ouvrez pas et attendez la procédure de retour que notre service client vous transmettra après vérification. Le remboursement interviendra au plus tard 14 jours après récupération du bien ou réception de la preuve de son renvoi.', 'demande');
+            $savChecklist = $this->module->l('COMMANDE EXPÉDIÉE (en transit) — le colis est parti : prévoir un refus de colis ou un retour. À vérifier : exclusions légales (art. L221-28). Le délai de 14 jours ne démarrera qu\'à la livraison.', 'demande');
+        } else {
+            $nextSteps = $this->module->l('Votre commande n\'ayant pas encore été expédiée, aucun retour de produit ne sera nécessaire. Après vérification de votre demande par notre service client, l\'expédition sera annulée et la totalité des sommes versées vous sera remboursée au plus tard 14 jours après votre demande, par le même moyen de paiement (art. L221-24).', 'demande');
+            $savChecklist = $this->module->l('COMMANDE NON EXPÉDIÉE — annulation avant expédition : aucun retour produit attendu. À vérifier : exclusions légales (art. L221-28). Pensez à bloquer l\'expédition avant validation.', 'demande');
+        }
+        $delivered = ($phase === 'delivered');
 
         $vars = [
             '{firstname}' => $customer->firstname,
@@ -365,7 +377,9 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             '{order_date}' => Tools::displayDate($order->date_add),
             '{delivery_date}' => $delivered
                 ? Tools::displayDate($request->delivery_date)
-                : $this->module->l('Non expédiée au moment de la demande', 'demande'),
+                : ($phase === 'shipped'
+                    ? $this->module->l('Expédiée, en cours d\'acheminement', 'demande')
+                    : $this->module->l('Non expédiée au moment de la demande', 'demande')),
             '{deadline}' => $request->legal_deadline ? Tools::displayDate($request->legal_deadline) : '-',
             '{request_id}' => (int) $request->id,
             '{next_steps}' => $nextSteps,
