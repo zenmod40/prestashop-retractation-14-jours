@@ -17,6 +17,14 @@ Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog]
 - L'éligibilité s'appuie désormais sur une **date de livraison effective** (drapeau natif OU état mappé « Livré »), une **phase logistique** (livré / expédié / non expédié) et une **liste d'états bloquants** (3 natifs + mapping).
 - La validation SAV envoie la procédure de retour pour les commandes livrées **et** en transit, et l'email d'annulation uniquement pour les commandes non expédiées.
 
+## [1.3.0] — 2026-06-14
+
+### Ajouté
+- **Compatibilité PrestaShop 9** (déclaration de compatibilité étendue à 9.x).
+
+### Modifié
+- Suppression des appels dépréciés : formatage des prix via `Locale::formatPrice()` (au lieu de `Tools::displayPrice`), date du formulaire générée côté PHP (plus de `strftime` déprécié en PHP 8.1).
+
 ## [1.2.0] — 2026-06-14
 
 ### Ajouté
