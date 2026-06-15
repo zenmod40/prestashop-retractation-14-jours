@@ -2,6 +2,9 @@
 .DS_Store
 Thumbs.db
 
+# Captures d'écran macOS (parasites à la racine)
+Capture d*.png
+
 # Archives / builds (le ZIP est distribué via le site, pas via le dépôt)
 *.zip
 *.zip.old
