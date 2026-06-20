@@ -2,6 +2,12 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.4.0] — 2026-06-20
+
+### Modifié
+- **Licence MIT → GPL v3.** Uniformisation avec le reste du catalogue open source ZM40 (CoolStats, ShortCodes, etc.). Le code reste libre ; les dérivés doivent désormais rester sous une licence GPL-compatible (copyleft fort) au lieu de pouvoir être close-sourcés. Les versions antérieures (1.0 à 1.3.1) restent disponibles sous MIT pour ceux qui les ont déjà téléchargées.
+- Page de configuration BO : bloc « libre & open source » mis à jour (mention GPL v3 + lien vers zm40.com — recentrage sur la marque catalogue ZM40, la marque atelier Magic Garden reste mentionnée).
+
 ## [1.3.1] — 2026-06-15
 
 ### Ajouté

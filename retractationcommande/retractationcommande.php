@@ -12,7 +12,7 @@
  *
  * @author    Magic Garden <https://magicgarden.fr>
  * @copyright 2026 Magic Garden
- * @license   MIT — https://opensource.org/licenses/MIT
+ * @license   GPL-3.0-or-later — https://www.gnu.org/licenses/gpl-3.0.html
  * @link      https://magicgarden.fr
  *
  * Aide à la mise en conformité : ne constitue pas un conseil juridique.
@@ -38,7 +38,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.3.1';
+        $this->version = '1.4.0';
         $this->author = 'Magic Garden';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -578,9 +578,9 @@ class RetractationCommande extends Module
             <div class="panel-heading"><i class="icon-leaf"></i> Magic Garden</div>
             <div class="row">
                 <div class="col-lg-8">
-                    <p>' . $this->l('Module gratuit développé par') . ' <strong>Magic Garden</strong> — '
-                        . '<a href="https://magicgarden.fr" target="_blank" rel="noopener">magicgarden.fr</a>. '
-                        . $this->l('Distribué sous licence MIT (libre d\'utilisation, de modification et de redistribution, mention d\'auteur conservée).') . '</p>
+                    <p>' . $this->l('Module gratuit développé par') . ' <strong>ZM40</strong> / Magic Garden — '
+                        . '<a href="https://zm40.com/retractation/" target="_blank" rel="noopener">zm40.com</a>. '
+                        . $this->l('Distribué sous licence GPL v3 (libre d\'utilisation, de modification et de redistribution).') . '</p>
                     <p class="text-muted"><small>' . $this->l('Ce module est une aide à la mise en conformité (droit de rétractation, art. L221-18 s. du Code de la consommation) et ne constitue pas un conseil juridique. Le marchand reste seul responsable de la conformité de sa boutique.') . '</small></p>
                     <p>' . $this->l('Besoin d\'aide à l\'installation, d\'une personnalisation ou d\'une garantie de conformité ?') . ' '
                         . '<a href="https://magicgarden.fr" target="_blank" rel="noopener">' . $this->l('Contactez-nous') . '</a>.</p>
