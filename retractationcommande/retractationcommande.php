@@ -24,6 +24,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once __DIR__ . '/classes/RetractationDelai.php';
 require_once __DIR__ . '/classes/RetractationRequest.php';
+require_once __DIR__ . '/lib/zm40/Zm40CommonRc.php';
 
 class RetractationCommande extends Module
 {
@@ -38,7 +39,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = 'Magic Garden';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -388,9 +389,89 @@ class RetractationCommande extends Module
             $output .= $this->displayConfirmation($this->l('Mapping des statuts enregistré.'));
         }
 
+        // Sauvegarde = bon moment pour rafraîchir le feed ZM40 (UX : un nouveau
+        // module publié apparaît dès la prochaine ouverture).
+        if (Tools::isSubmit('submitRetractationConfig') || Tools::isSubmit('submitRetractationMapping')) {
+            Zm40CommonRc::clearFeedCache();
+        }
+
         $activeTab = Tools::isSubmit('submitRetractationMapping') ? 'rc-tab-mapping' : 'rc-tab-config';
 
-        return $output . $this->renderTabs($activeTab);
+        return $output
+            . $this->renderAdminHeader()
+            . $this->renderUpdateNotice()
+            . $this->renderTabs($activeTab)
+            . $this->renderEcosystem()
+            . $this->renderCredits();
+    }
+
+    /**
+     * Header standard ZM40 (zm40-ah) — bandeau dégradé commun à tous les modules
+     * ZM40 pour une identité visuelle homogène. Seule la couleur dominante change
+     * par module (Rétractation : vert, cohérent avec l'accent du module).
+     */
+    protected function renderAdminHeader()
+    {
+        $shop = htmlspecialchars((string) Configuration::get('PS_SHOP_NAME'), ENT_QUOTES, 'UTF-8');
+        $name = htmlspecialchars((string) $this->displayName, ENT_QUOTES, 'UTF-8');
+        $sub  = htmlspecialchars($this->l('Droit de rétractation 14 jours — conformité PrestaShop (ordonnance n°2026-2)'), ENT_QUOTES, 'UTF-8');
+        $ver  = htmlspecialchars((string) $this->version, ENT_QUOTES, 'UTF-8');
+        $c1 = '#2e7d32';
+        $c2 = '#1b4d20';
+
+        return <<<HTML
+<style>
+.zm40-ah { background: linear-gradient(135deg, {$c1} 0%, {$c2} 100%); color: #fff; padding: 28px 32px; border-radius: 8px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.zm40-ah * { box-sizing: border-box; }
+.zm40-ah h2 { margin: 0; font-size: 22px; font-weight: 600; color: #fff; line-height: 1.2; }
+.zm40-ah-sub { opacity: 0.85; font-size: 13px; margin-top: 4px; color: #fff; }
+.zm40-ah-badge { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; color: #fff; white-space: nowrap; }
+</style>
+<div class="zm40-ah">
+    <div>
+        <h2>{$name}</h2>
+        <div class="zm40-ah-sub">{$sub} &middot; v{$ver}</div>
+    </div>
+    <span class="zm40-ah-badge">{$shop}</span>
+</div>
+HTML;
+    }
+
+    /**
+     * Notice de mise à jour (notify-only) — affichée si une version supérieure est
+     * disponible sur GitHub. Fail-silent : aucune notice si réseau OFF.
+     */
+    protected function renderUpdateNotice()
+    {
+        $u = Zm40CommonRc::checkUpdate('retractationcommande', $this->version);
+        if (!$u || empty($u['available'])) {
+            return '';
+        }
+        $css = '<link rel="stylesheet" href="' . $this->_path . 'views/css/zm40-common.css">';
+        $latest = htmlspecialchars((string) $u['latest'], ENT_QUOTES, 'UTF-8');
+        $url = htmlspecialchars((string) $u['url'], ENT_QUOTES, 'UTF-8');
+        $msg = htmlspecialchars(sprintf($this->l('Une nouvelle version du module est disponible : %s.'), $latest), ENT_QUOTES, 'UTF-8');
+        $view = htmlspecialchars($this->l('Voir la release →'), ENT_QUOTES, 'UTF-8');
+
+        return $css . '<div class="zm40-update-notice"><span>' . $msg . '</span>'
+            . '<a href="' . $url . '" target="_blank" rel="noopener">' . $view . '</a></div>';
+    }
+
+    /**
+     * Bloc « L'écosystème ZM40 » — feed des autres modules ZM40 disponibles.
+     * Le CSS .zm40-eco-* est chargé ici pour garantir le layout. Fail-silent :
+     * rien si réseau OFF ou feed vide.
+     */
+    protected function renderEcosystem()
+    {
+        $modules = Zm40CommonRc::modulesFeed('retractationcommande');
+        if (empty($modules)) {
+            return '';
+        }
+        $this->context->smarty->assign(array('zm40_modules' => $modules));
+        $css = '<link rel="stylesheet" href="' . $this->_path . 'views/css/zm40-common.css">';
+
+        return $css . $this->display(__FILE__, 'views/templates/admin/_partials/zm40_modules.tpl');
     }
 
     /**
@@ -563,7 +644,7 @@ class RetractationCommande extends Module
         $nav .= '</ul>';
         $panes .= '</div>';
 
-        return '<div class="panel">' . $nav . $panes . '</div>' . $this->renderCredits();
+        return '<div class="panel">' . $nav . $panes . '</div>';
     }
 
     /**

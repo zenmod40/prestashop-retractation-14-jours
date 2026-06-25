@@ -14,6 +14,23 @@ require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPdf.php
 
 class AdminRetractationController extends ModuleAdminController
 {
+    /**
+     * Compat traduction cross-version : PrestaShop 9 a retiré la méthode legacy
+     * l() des contrôleurs admin (UndefinedMethodError). On délègue au natif sur
+     * 1.7/8, sinon à Module::l() (repli ultime : chaîne source).
+     */
+    public function l($string, $class = null, $addslashes = false, $htmlentities = true)
+    {
+        if (method_exists(get_parent_class($this), 'l')) {
+            return parent::l($string, $class, $addslashes, $htmlentities);
+        }
+        if (isset($this->module) && $this->module instanceof Module) {
+            return $this->module->l($string, 'adminretractationcontroller');
+        }
+
+        return $string;
+    }
+
     public function __construct()
     {
         $this->table = 'retractation_request';

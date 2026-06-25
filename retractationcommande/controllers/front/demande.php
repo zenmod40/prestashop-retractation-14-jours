@@ -306,7 +306,7 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
 
         $this->context->smarty->assign([
             'rc_request_ref' => $request->reference,
-            'rc_request_date' => Tools::displayDate(date('Y-m-d H:i:s'), null, true),
+            'rc_request_date' => Tools::displayDate(date('Y-m-d H:i:s'), true),
             'rc_is_delivered' => (bool) $eligibility['delivered'],
             'rc_phase' => $eligibility['shipping_phase'],
             'rc_is_full_order' => $isFullOrder,

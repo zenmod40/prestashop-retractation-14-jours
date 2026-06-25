@@ -7,6 +7,14 @@ gratuite, visible et facilement accessible), applicables au **19 juin 2026**.
 
 **Compatibilité :** PrestaShop **1.7.6 → 9.x** · PHP 7.2 → 8.3.
 
+## Nouveautés v1.4 — Header ZM40, écosystème, GPL v3 & compatibilité PrestaShop 9.1
+
+- **Header d'administration ZM40** (v1.4.2) : bandeau dégradé commun à la gamme ZM40 en haut de la page de configuration (nom du module, sous-titre, version, boutique).
+- **Panneau « L'écosystème ZM40 »** (v1.4.2) : liste des autres modules ZM40 (open source et pro), alimentée par un feed distant anonyme et *fail-silent* — badge « Déjà installé » et bouton « Configurer » pour les modules présents. Désactivable comme tout appel réseau ZM40 (`ZM40_NET_ENABLED`).
+- **Compatibilité PrestaShop 9.1** (v1.4.2) : correction de deux erreurs fatales sous PS 9 — méthode de traduction legacy `l()` retirée des contrôleurs admin (couche de compatibilité ajoutée) et `Tools::displayDate()` appelé avec 3 arguments alors que la signature n'en prend plus que 2. *Merci au contributeur ayant remonté ces points.*
+- **Correctif parcours invité** (v1.4.1) : `Validate::isOrderReference()` (méthode inexistante) provoquait une erreur fatale lors d'une recherche par email + référence d'un visiteur non connecté. Remplacé par `Validate::isReference()`.
+- **Licence MIT → GPL v3** (v1.4.0) : uniformisation avec le catalogue open source ZM40. Les versions 1.0 → 1.3.1 restent disponibles sous MIT pour ceux qui les ont déjà téléchargées. Bloc « libre & open source » de la config mis à jour (mention GPL v3 + recentrage marque ZM40).
+
 ## Nouveautés v1.3.1 — Mapping des statuts + parcours « en transit »
 
 - **Onglet « Mapping des statuts »** dans la configuration (façon CoolStats) : une matrice interactive associe chaque statut de commande à un rôle —

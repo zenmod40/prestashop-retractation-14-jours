@@ -2,6 +2,16 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.4.2] — 2026-06-25
+
+### Ajouté
+- **Header d'administration ZM40** : bandeau dégradé commun à la gamme ZM40 en haut de la page de configuration (nom du module, sous-titre, version, boutique).
+- **Panneau « L'écosystème ZM40 »** : liste des autres modules ZM40 disponibles (open source et pro), alimentée par un feed distant anonyme et fail-silent — badge « Déjà installé » et bouton « Configurer » pour les modules présents sur la boutique. Désactivable comme tout appel réseau ZM40 (`ZM40_NET_ENABLED`).
+
+### Corrigé
+- **Compatibilité PrestaShop 9.1** : le contrôleur d'administration (Demandes) utilisait la méthode de traduction legacy `l()`, retirée des contrôleurs admin en PrestaShop 9 (erreur fatale `UndefinedMethodError`). Ajout d'une couche de compatibilité (délégation au natif sur 1.7/8, sinon à `Module::l()`).
+- **Compatibilité PrestaShop 9.1** : appel à `Tools::displayDate()` avec 3 arguments dans le parcours de demande (accusé de réception) — la signature ne prend plus que 2 arguments en PrestaShop 9. Merci au contributeur ayant remonté ces deux points.
+
 ## [1.4.1] — 2026-06-25
 
 ### Corrigé
