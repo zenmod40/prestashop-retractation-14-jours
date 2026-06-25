@@ -2,6 +2,11 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.4.1] — 2026-06-25
+
+### Corrigé
+- **Parcours invité** : appel à une méthode inexistante `Validate::isOrderReference()` qui provoquait une erreur fatale lorsqu'un visiteur non connecté (sans compte) soumettait le formulaire de recherche par email + référence. Remplacé par la méthode native `Validate::isReference()`.
+
 ## [1.4.0] — 2026-06-20
 
 ### Modifié

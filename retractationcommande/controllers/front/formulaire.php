@@ -119,7 +119,7 @@ class RetractationCommandeFormulaireModuleFrontController extends ModuleFrontCon
     {
         $genericError = $this->module->l('Aucune commande ne correspond à ces informations. Vérifiez l\'adresse email et la référence (présentes sur votre email de confirmation de commande).', 'formulaire');
 
-        if (!Validate::isEmail($email) || !Validate::isOrderReference($reference)) {
+        if (!Validate::isEmail($email) || !Validate::isReference($reference)) {
             return $genericError;
         }
 
