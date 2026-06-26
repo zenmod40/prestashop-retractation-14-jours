@@ -39,7 +39,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.4.2';
+        $this->version = '1.4.3';
         $this->author = 'Magic Garden';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -72,6 +72,7 @@ class RetractationCommande extends Module
             && Configuration::updateValue('RETRACTATION_EXCLUDED_CATS', '')
             && Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', '')
             && Configuration::updateValue('RETRACTATION_PROCEDURE_TEXT', $this->getDefaultProcedureText(), true)
+            && Configuration::updateValue('RETRACTATION_CUSTOM_CSS', '', true)
             && $this->installDefaultStateMapping();
     }
 
@@ -97,6 +98,7 @@ class RetractationCommande extends Module
             'RETRACTATION_HIDE_NATIVE_FORM', 'RETRACTATION_DELAY_DAYS', 'RETRACTATION_LINK_LABEL',
             'RETRACTATION_SHOW_FOOTER_LINK', 'RETRACTATION_DELIVERED_STATES', 'RETRACTATION_SHIPPED_STATES', 'RETRACTATION_BLOCKED_STATES',
             'RETRACTATION_EXCLUDED_CATS', 'RETRACTATION_EXCLUDED_PRODUCTS', 'RETRACTATION_PROCEDURE_TEXT',
+            'RETRACTATION_CUSTOM_CSS',
         ] as $key) {
             Configuration::deleteByName($key);
         }
@@ -369,9 +371,14 @@ class RetractationCommande extends Module
                 Configuration::updateValue('RETRACTATION_CREATE_ORDER_RETURN', (int) Tools::getValue('RETRACTATION_CREATE_ORDER_RETURN'));
                 Configuration::updateValue('RETRACTATION_ALLOW_UNDELIVERED', (int) Tools::getValue('RETRACTATION_ALLOW_UNDELIVERED'));
                 Configuration::updateValue('RETRACTATION_HIDE_NATIVE_FORM', (int) Tools::getValue('RETRACTATION_HIDE_NATIVE_FORM'));
-                Configuration::updateValue('RETRACTATION_EXCLUDED_CATS', $this->sanitizeIdList(Tools::getValue('RETRACTATION_EXCLUDED_CATS')));
+                // Catégories : sélecteur natif PrestaShop (arbre à cases) → tableau categoryBox.
+                $excludedCats = Tools::getValue('categoryBox');
+                $excludedCats = is_array($excludedCats) ? implode(',', array_filter(array_map('intval', $excludedCats))) : '';
+                Configuration::updateValue('RETRACTATION_EXCLUDED_CATS', $excludedCats);
+                // Produits : widget autocomplete → champ caché CSV d'IDs.
                 Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', $this->sanitizeIdList(Tools::getValue('RETRACTATION_EXCLUDED_PRODUCTS')));
                 Configuration::updateValue('RETRACTATION_PROCEDURE_TEXT', Tools::getValue('RETRACTATION_PROCEDURE_TEXT'), true);
+                Configuration::updateValue('RETRACTATION_CUSTOM_CSS', Tools::getValue('RETRACTATION_CUSTOM_CSS'), true);
                 $output .= $this->displayConfirmation($this->l('Configuration enregistrée.'));
             }
         }
@@ -679,6 +686,8 @@ HTML;
 
     protected function renderConfigForm()
     {
+        $selectedCats = array_filter(array_map('intval', explode(',', (string) Configuration::get('RETRACTATION_EXCLUDED_CATS'))));
+
         $form = [
             'form' => [
                 'legend' => ['title' => $this->l('Rétractation — configuration'), 'icon' => 'icon-undo'],
@@ -744,16 +753,22 @@ HTML;
                         ],
                     ],
                     [
-                        'type' => 'text',
-                        'label' => $this->l('Catégories exclues (IDs)'),
-                        'name' => 'RETRACTATION_EXCLUDED_CATS',
-                        'desc' => $this->l('IDs de catégories séparés par des virgules — produits exclus du droit de rétractation (sur mesure, périssables, hygiène… art. L221-28). Le bouton est masqué si TOUTE la commande est exclue ; sinon une alerte est affichée au SAV.'),
+                        'type' => 'categories',
+                        'label' => $this->l('Catégories exclues'),
+                        'name' => 'categoryBox',
+                        'tree' => [
+                            'id' => 'rc-excluded-cats',
+                            'use_search' => true,
+                            'use_checkbox' => true,
+                            'selected_categories' => $selectedCats,
+                        ],
+                        'desc' => $this->l('Cochez les catégories dont les produits sont exclus du droit de rétractation (sur mesure, périssables, hygiène… art. L221-28). Le bouton est masqué si TOUTE la commande est exclue ; sinon une alerte est affichée au SAV.'),
                     ],
                     [
-                        'type' => 'text',
-                        'label' => $this->l('Produits exclus (IDs)'),
-                        'name' => 'RETRACTATION_EXCLUDED_PRODUCTS',
-                        'desc' => $this->l('IDs de produits séparés par des virgules.'),
+                        'type' => 'html',
+                        'label' => $this->l('Produits exclus'),
+                        'name' => 'rc_excluded_products_html',
+                        'html_content' => $this->renderProductPicker(),
                     ],
                     [
                         'type' => 'textarea',
@@ -761,6 +776,14 @@ HTML;
                         'name' => 'RETRACTATION_PROCEDURE_TEXT',
                         'autoload_rte' => true,
                         'desc' => $this->l('Texte envoyé au client lorsque le SAV valide la demande (adresse de retour, consignes, remboursement).'),
+                    ],
+                    [
+                        'type' => 'textarea',
+                        'label' => $this->l('CSS personnalisé (front)'),
+                        'name' => 'RETRACTATION_CUSTOM_CSS',
+                        'rows' => 8,
+                        'class' => 'rc-css-area',
+                        'desc' => $this->l('Optionnel — injecté sur les pages de rétractation (formulaire, fenêtre, lien). Permet d\'adapter typographie et couleurs à votre charte sans accès FTP ni surcharge de thème. Exemple : .retractation-modal { font-family: "Poppins", sans-serif; } .retractation-btn { background: #c0392b; }'),
                     ],
                 ],
                 'submit' => ['title' => $this->l('Enregistrer')],
@@ -781,12 +804,231 @@ HTML;
             'RETRACTATION_CREATE_ORDER_RETURN' => Tools::getValue('RETRACTATION_CREATE_ORDER_RETURN', Configuration::get('RETRACTATION_CREATE_ORDER_RETURN')),
             'RETRACTATION_HIDE_NATIVE_FORM' => Tools::getValue('RETRACTATION_HIDE_NATIVE_FORM', Configuration::get('RETRACTATION_HIDE_NATIVE_FORM')),
             'RETRACTATION_ALLOW_UNDELIVERED' => Tools::getValue('RETRACTATION_ALLOW_UNDELIVERED', Configuration::get('RETRACTATION_ALLOW_UNDELIVERED')),
-            'RETRACTATION_EXCLUDED_CATS' => Tools::getValue('RETRACTATION_EXCLUDED_CATS', Configuration::get('RETRACTATION_EXCLUDED_CATS')),
-            'RETRACTATION_EXCLUDED_PRODUCTS' => Tools::getValue('RETRACTATION_EXCLUDED_PRODUCTS', Configuration::get('RETRACTATION_EXCLUDED_PRODUCTS')),
             'RETRACTATION_PROCEDURE_TEXT' => Tools::getValue('RETRACTATION_PROCEDURE_TEXT', Configuration::get('RETRACTATION_PROCEDURE_TEXT')),
+            'RETRACTATION_CUSTOM_CSS' => Tools::getValue('RETRACTATION_CUSTOM_CSS', Configuration::get('RETRACTATION_CUSTOM_CSS')),
         ];
 
-        return $helper->generateForm([$form]);
+        return $helper->generateForm([$form]) . $this->renderCatTreeTweaks();
+    }
+
+    /**
+     * Replace le champ de recherche de l'arbre de catégories (rendu en haut à
+     * droite par PrestaShop) au-dessus de l'arbre, en pleine largeur — plus
+     * naturel à l'usage. N'affecte pas le comportement natif des boutons.
+     */
+    protected function renderCatTreeTweaks()
+    {
+        return <<<HTML
+<style>
+.rc-cat-panel .rc-cat-search-wrap { width: 100%; margin: 0 0 14px; }
+.rc-cat-panel .rc-cat-search-wrap .search-field { width: 100%; max-width: 100%; float: none; }
+.rc-cat-panel .tree-panel-heading-controls { padding: 0; margin: 0; }
+.rc-cat-panel .tree-actions { float: none !important; display: block; text-align: right; margin: 0 0 8px; padding: 0; }
+.rc-cat-panel .tree-actions .btn { float: none; margin: 0 0 0 6px; }
+#collapse-all-rc-excluded-cats, #expand-all-rc-excluded-cats { display: inline-block !important; }
+</style>
+<script type="text/javascript">
+(function () {
+    function init() {
+        var ul = document.getElementById('rc-excluded-cats');
+        if (!ul || ul.getAttribute('data-rc-init')) { return; }
+        var panel = ul.parentNode;
+        while (panel && (!panel.className || ('' + panel.className).indexOf('panel') === -1)) { panel = panel.parentNode; }
+        if (!panel) { panel = ul.parentNode; }
+        ul.setAttribute('data-rc-init', '1');
+        panel.className += ' rc-cat-panel';
+
+        var input = panel.querySelector('.search-field');
+        if (!input) { return; }
+
+        // Sort le champ de la barre d'outils et le place en haut, pleine largeur.
+        var wrap = document.createElement('div');
+        wrap.className = 'rc-cat-search-wrap';
+        if (input.parentNode) { input.parentNode.removeChild(input); }
+        if (input.classList) { input.classList.remove('pull-right'); }
+        wrap.appendChild(input);
+        panel.insertBefore(wrap, panel.firstChild);
+
+        // Filtre maison : le typeahead natif n'est pas chargé sur la page de
+        // configuration d'un module. On masque/affiche les nœuds selon la saisie,
+        // en révélant le chemin (parents) de chaque correspondance.
+        var items = ul.getElementsByTagName('li');
+        input.addEventListener('input', function () {
+            var q = input.value.trim().toLowerCase();
+            var i, li, p, clone, subs;
+            if (!q) { for (i = 0; i < items.length; i++) { items[i].style.display = ''; } return; }
+            for (i = 0; i < items.length; i++) { items[i].style.display = 'none'; }
+            for (i = 0; i < items.length; i++) {
+                li = items[i];
+                clone = li.cloneNode(true);
+                subs = clone.getElementsByTagName('ul');
+                while (subs.length) { subs[0].parentNode.removeChild(subs[0]); }
+                if (clone.textContent.toLowerCase().indexOf(q) > -1) {
+                    li.style.display = '';
+                    p = li.parentNode;
+                    while (p && p !== panel) {
+                        if (p.tagName === 'LI' || p.tagName === 'UL') { p.style.display = ''; }
+                        p = p.parentNode;
+                    }
+                }
+            }
+        });
+    }
+    if (document.readyState !== 'loading') { setTimeout(init, 0); }
+    else { document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 0); }); }
+})();
+</script>
+HTML;
+    }
+
+    /**
+     * Endpoint AJAX du sélecteur de produits exclus, appelé directement sur le
+     * module via le branchement natif des pages de config (AdminModules &
+     * configure=… & ajax=1 & action=SearchProducts). Renvoie un JSON
+     * [{id, name, ref}, …]. Recherche par nom ou référence.
+     */
+    public function ajaxProcessSearchProducts()
+    {
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        $q = trim((string) Tools::getValue('q'));
+        $out = [];
+        if (Tools::strlen($q) >= 2) {
+            $idLang = (int) $this->context->language->id;
+            $found = Product::searchByName($idLang, $q);
+            if (is_array($found)) {
+                $i = 0;
+                foreach ($found as $p) {
+                    $out[] = [
+                        'id' => (int) $p['id_product'],
+                        'name' => $p['name'],
+                        'ref' => isset($p['reference']) ? $p['reference'] : '',
+                    ];
+                    if (++$i >= 20) {
+                        break;
+                    }
+                }
+            }
+        }
+        header('Content-Type: application/json');
+        die(json_encode($out));
+    }
+
+    /**
+     * Widget de sélection des produits exclus : recherche autocomplete (AJAX) +
+     * « chips ». Stocke des IDs en CSV dans le champ caché RETRACTATION_EXCLUDED_PRODUCTS.
+     * L'endpoint de recherche est ajaxProcessSearchProducts() (ci-dessus).
+     */
+    protected function renderProductPicker()
+    {
+        $idLang = (int) $this->context->language->id;
+        $ids = array_filter(array_map('intval', explode(',', (string) Configuration::get('RETRACTATION_EXCLUDED_PRODUCTS'))));
+        $csv = implode(',', $ids);
+
+        $chips = '';
+        foreach ($ids as $id) {
+            $p = new Product($id, false, $idLang);
+            $label = Validate::isLoadedObject($p) ? $p->name . ' (#' . $id . ')' : ('#' . $id);
+            $label = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+            $chips .= '<span class="rc-chip" data-id="' . (int) $id . '">' . $label
+                . ' <button type="button" class="rc-chip-x" aria-label="x">&times;</button></span>';
+        }
+
+        $url = $this->context->link->getAdminLink('AdminModules') . '&configure=' . $this->name . '&ajax=1&action=SearchProducts';
+        $url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $ph = htmlspecialchars($this->l('Rechercher un produit par nom ou référence…'), ENT_QUOTES, 'UTF-8');
+        $hint = htmlspecialchars($this->l('Tapez au moins 2 caractères. Les produits ajoutés sont exclus du droit de rétractation.'), ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<style>
+.rc-pp { max-width: 600px; }
+.rc-pp-search { position: relative; }
+.rc-pp-search input.rc-search { width: 100%; }
+.rc-pp-dd { position: absolute; z-index: 30; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #ccc; border-top: 0; max-height: 240px; overflow-y: auto; display: none; box-shadow: 0 4px 10px rgba(0,0,0,.08); }
+.rc-pp-dd .rc-opt { padding: 7px 10px; cursor: pointer; font-size: 13px; }
+.rc-pp-dd .rc-opt:hover { background: #f3f6f9; }
+.rc-pp-chips { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.rc-chip { display: inline-flex; align-items: center; gap: 6px; background: #eef5ee; border: 1px solid #cfe0cf; color: #2e5a31; border-radius: 16px; padding: 3px 6px 3px 12px; font-size: 12.5px; }
+.rc-chip-x { border: 0; background: transparent; color: #2e7d32; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; }
+.rc-chip-x:hover { color: #c0392b; }
+.rc-pp-hint { color: #888; font-size: 12px; margin-top: 6px; }
+</style>
+<div class="rc-pp" id="rc-pp" data-url="{$url}">
+    <input type="hidden" name="RETRACTATION_EXCLUDED_PRODUCTS" id="rc-pp-input" value="{$csv}">
+    <div class="rc-pp-search">
+        <input type="text" class="form-control rc-search" autocomplete="off" placeholder="{$ph}">
+        <div class="rc-pp-dd"></div>
+    </div>
+    <div class="rc-pp-chips">{$chips}</div>
+    <div class="rc-pp-hint">{$hint}</div>
+</div>
+<script>
+(function(){
+    var box = document.getElementById('rc-pp');
+    if (!box || box.getAttribute('data-init')) { return; }
+    box.setAttribute('data-init', '1');
+    var input = document.getElementById('rc-pp-input');
+    var search = box.querySelector('.rc-search');
+    var dd = box.querySelector('.rc-pp-dd');
+    var chips = box.querySelector('.rc-pp-chips');
+    var url = box.getAttribute('data-url');
+    var timer = null;
+    function ids() { return input.value.split(',').map(function(s){ return s.trim(); }).filter(Boolean); }
+    function setIds(arr) {
+        var seen = {}, out = [];
+        arr.forEach(function(v){ if (v && !seen[v]) { seen[v] = 1; out.push(v); } });
+        input.value = out.join(',');
+    }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+    function addChip(id, name) {
+        var cur = ids();
+        if (cur.indexOf(String(id)) > -1) { return; }
+        cur.push(String(id)); setIds(cur);
+        var c = document.createElement('span');
+        c.className = 'rc-chip'; c.setAttribute('data-id', id);
+        c.innerHTML = esc(name) + ' <button type="button" class="rc-chip-x">&times;</button>';
+        chips.appendChild(c);
+    }
+    chips.addEventListener('click', function(e){
+        if (e.target.classList.contains('rc-chip-x')) {
+            var c = e.target.parentNode;
+            setIds(ids().filter(function(x){ return x !== c.getAttribute('data-id'); }));
+            c.parentNode.removeChild(c);
+        }
+    });
+    search.addEventListener('input', function(){
+        clearTimeout(timer);
+        var q = search.value.trim();
+        if (q.length < 2) { dd.style.display = 'none'; dd.innerHTML = ''; return; }
+        timer = setTimeout(function(){
+            var x = new XMLHttpRequest();
+            x.open('GET', url + '&q=' + encodeURIComponent(q), true);
+            x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            x.onload = function(){
+                var list = [];
+                try { list = JSON.parse(x.responseText) || []; } catch (err) { list = []; }
+                dd.innerHTML = '';
+                if (!list.length) { dd.style.display = 'none'; return; }
+                list.forEach(function(it){
+                    var d = document.createElement('div');
+                    d.className = 'rc-opt';
+                    d.textContent = it.name + ' (#' + it.id + ')' + (it.ref ? ' · ' + it.ref : '');
+                    d.addEventListener('click', function(){
+                        addChip(it.id, it.name + ' (#' + it.id + ')');
+                        dd.style.display = 'none'; search.value = '';
+                    });
+                    dd.appendChild(d);
+                });
+                dd.style.display = 'block';
+            };
+            x.send();
+        }, 250);
+    });
+    document.addEventListener('click', function(e){ if (!box.contains(e.target)) { dd.style.display = 'none'; } });
+})();
+</script>
+HTML;
     }
 
     /**
@@ -929,19 +1171,37 @@ HTML;
      */
     public function hookDisplayFooter($params)
     {
-        if (!Configuration::get('RETRACTATION_SHOW_FOOTER_LINK')) {
-            return '';
-        }
-        // Lien réservé aux clients connectés.
-        if (!$this->context->customer->isLogged()) {
-            return '';
-        }
-        $this->context->smarty->assign([
-            'retractation_link_label' => Configuration::get('RETRACTATION_LINK_LABEL'),
-            'retractation_link_url' => $this->context->link->getModuleLink($this->name, 'formulaire', []),
-        ]);
+        // Le CSS personnalisé est injecté sur toutes les pages front (le hook
+        // footer est rendu partout) pour s'appliquer où que le module s'affiche.
+        $out = $this->getCustomCssTag();
 
-        return $this->display(__FILE__, 'views/templates/hook/footer-link.tpl');
+        // Lien réservé aux clients connectés, si activé.
+        if (Configuration::get('RETRACTATION_SHOW_FOOTER_LINK') && $this->context->customer->isLogged()) {
+            $this->context->smarty->assign([
+                'retractation_link_label' => Configuration::get('RETRACTATION_LINK_LABEL'),
+                'retractation_link_url' => $this->context->link->getModuleLink($this->name, 'formulaire', []),
+            ]);
+            $out .= $this->display(__FILE__, 'views/templates/hook/footer-link.tpl');
+        }
+
+        return $out;
+    }
+
+    /**
+     * Balise <style> du CSS personnalisé saisi en configuration (charte du
+     * marchand, sans accès FTP). Anti-injection : on retire toute fermeture de
+     * balise <style> et tout balisage HTML — seul du CSS brut peut sortir.
+     */
+    protected function getCustomCssTag()
+    {
+        $css = trim((string) Configuration::get('RETRACTATION_CUSTOM_CSS'));
+        if ($css === '') {
+            return '';
+        }
+        $css = str_ireplace('</style', '', $css);
+        $css = strip_tags($css);
+
+        return '<style data-rc-custom="1">' . $css . '</style>';
     }
 
     /**

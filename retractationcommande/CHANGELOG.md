@@ -2,6 +2,16 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.4.3] — 2026-06-25
+
+### Ajouté
+- **Sélecteur de catégories visuel** : la saisie des catégories exclues se fait désormais via un **arbre de catégories** (cases à cocher), avec un champ de **recherche instantanée** en haut qui filtre l'arborescence en direct — au lieu d'une liste d'IDs séparés par des virgules.
+- **Sélecteur de produits avec recherche** : champ d'**autocomplétion** (recherche par nom ou référence, ajout/retrait sous forme d'étiquettes) pour les produits exclus, au lieu d'une liste d'IDs.
+- **CSS personnalisé (front)** : nouveau champ en configuration permettant d'adapter typographie et couleurs des pages de rétractation à la charte graphique de la boutique, **sans accès FTP ni surcharge de thème** (injection sécurisée, anti-injection HTML).
+
+### Modifié
+- Les pages front du module **héritent explicitement** de la typographie du thème (boutons et champs inclus, qui ne suivaient pas la police du thème par défaut).
+
 ## [1.4.2] — 2026-06-25
 
 ### Ajouté

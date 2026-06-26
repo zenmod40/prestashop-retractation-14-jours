@@ -1,5 +1,21 @@
 /* Rétractation Commande — front */
 
+/* ---------- Héritage de la charte graphique du thème ----------
+   Le module n'impose aucune police : tout hérite de la typographie du thème.
+   Les boutons / champs n'héritent pas de la police par défaut (UA) — on force
+   donc l'héritage pour qu'ils suivent la charte du marchand. Surchargeable via
+   le champ « CSS personnalisé » de la configuration du module. */
+.retractation-overlay,
+.retractation-modal,
+.retractation-modal h1, .retractation-modal h2, .retractation-modal h3,
+.retractation-btn,
+.retractation-modal button,
+.retractation-modal input,
+.retractation-modal textarea,
+.retractation-modal select {
+  font-family: inherit;
+}
+
 /* Liens d'action compacts sur la page Mes commandes */
 .page-customer-account #content .order-actions a {
   padding: 0.125rem 0.5rem;
