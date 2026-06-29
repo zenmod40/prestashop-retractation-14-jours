@@ -7,13 +7,26 @@ gratuite, visible et facilement accessible), applicables au **19 juin 2026**.
 
 **Compatibilité :** PrestaShop **1.7.6 → 9.x** · PHP 7.2 → 8.3.
 
-## Nouveautés v1.4 — Header ZM40, écosystème, GPL v3 & compatibilité PrestaShop 9.1
+## Nouveautés v1.4.4 — Photos jointes & adresse de retour
 
-- **Header d'administration ZM40** (v1.4.2) : bandeau dégradé commun à la gamme ZM40 en haut de la page de configuration (nom du module, sous-titre, version, boutique).
-- **Panneau « L'écosystème ZM40 »** (v1.4.2) : liste des autres modules ZM40 (open source et pro), alimentée par un feed distant anonyme et *fail-silent* — badge « Déjà installé » et bouton « Configurer » pour les modules présents. Désactivable comme tout appel réseau ZM40 (`ZM40_NET_ENABLED`).
-- **Compatibilité PrestaShop 9.1** (v1.4.2) : correction de deux erreurs fatales sous PS 9 — méthode de traduction legacy `l()` retirée des contrôleurs admin (couche de compatibilité ajoutée) et `Tools::displayDate()` appelé avec 3 arguments alors que la signature n'en prend plus que 2. *Merci au contributeur ayant remonté ces points.*
+- **Photos jointes par le client (sécurisé)** : option permettant au client de joindre des photos (état du produit et de son emballage) lors de la demande de rétractation. Facultatif et jamais bloquant. Chaque image est validée par le système natif PrestaShop (`ImageManager`) **puis ré-encodée** (reconstruction à partir des pixels, ce qui détruit tout contenu malveillant éventuellement embarqué), stockée hors d'accès direct et consultable en back-office sur la fiche de la demande. Activable depuis la configuration (« Autoriser les photos »). Formats acceptés : JPG, PNG, WebP, GIF (jamais de SVG) ; 4 photos maximum, 4 Mo chacune.
+- **Adresse de retour** : nouveau champ de configuration pour indiquer une adresse de retour distincte de celle de la boutique (centre logistique, entrepôt, prestataire…). Elle s'affiche sur l'accusé de réception PDF et dans la procédure de retour envoyée au client à l'acceptation. Laissé vide, l'adresse de la boutique est utilisée comme avant.
+- **Écosystème ZM40 dans un onglet dédié** : la liste des autres modules ZM40 passe dans un onglet « Modules ZM40 » de la page de configuration, au lieu d'un bloc en bas de page.
+
+## Nouveautés v1.4.3 — Sélecteurs visuels & CSS personnalisé front
+
+- **Sélecteur de catégories visuel** : la saisie des catégories exclues se fait désormais via un **arbre de catégories** (cases à cocher), avec un champ de **recherche instantanée** en haut qui filtre l'arborescence en direct — au lieu d'une liste d'IDs séparés par des virgules.
+- **Sélecteur de produits avec recherche** : champ d'**autocomplétion** (recherche par nom ou référence, ajout/retrait sous forme d'étiquettes) pour les produits exclus, au lieu d'une liste d'IDs.
+- **CSS personnalisé (front)** : nouveau champ en configuration permettant d'adapter typographie et couleurs des pages de rétractation à la charte graphique de la boutique, **sans accès FTP ni surcharge de thème** (injection sécurisée, anti-injection HTML).
+- Les pages front du module **héritent explicitement** de la typographie du thème (boutons et champs inclus, qui ne suivaient pas la police du thème par défaut).
+
+## Nouveautés v1.4.2 — Header ZM40, écosystème & compatibilité PrestaShop 9.1
+
+- **Header d'administration ZM40** : bandeau dégradé commun à la gamme ZM40 en haut de la page de configuration (nom du module, sous-titre, version, boutique).
+- **Panneau « L'écosystème ZM40 »** : liste des autres modules ZM40 (open source et pro), alimentée par un feed distant anonyme et *fail-silent* — badge « Déjà installé » et bouton « Configurer » pour les modules présents. Désactivable comme tout appel réseau ZM40 (`ZM40_NET_ENABLED`).
+- **Compatibilité PrestaShop 9.1** : correction de deux erreurs fatales sous PS 9 — méthode de traduction legacy `l()` retirée des contrôleurs admin (couche de compatibilité ajoutée) et `Tools::displayDate()` appelé avec 3 arguments alors que la signature n'en prend plus que 2. *Merci au contributeur ayant remonté ces points.*
 - **Correctif parcours invité** (v1.4.1) : `Validate::isOrderReference()` (méthode inexistante) provoquait une erreur fatale lors d'une recherche par email + référence d'un visiteur non connecté. Remplacé par `Validate::isReference()`.
-- **Licence MIT → GPL v3** (v1.4.0) : uniformisation avec le catalogue open source ZM40. Les versions 1.0 → 1.3.1 restent disponibles sous MIT pour ceux qui les ont déjà téléchargées. Bloc « libre & open source » de la config mis à jour (mention GPL v3 + recentrage marque ZM40).
+- **Licence MIT → GPL v3** (v1.4.0) : uniformisation avec le catalogue open source ZM40. Les versions 1.0 → 1.3.1 restent disponibles sous MIT pour ceux qui les ont déjà téléchargées.
 
 ## Nouveautés v1.3.1 — Mapping des statuts + parcours « en transit »
 
@@ -165,14 +178,16 @@ retractationcommande/
 
 ## Auteur
 
-Développé par **[Magic Garden](https://magicgarden.fr)** — création de sites & e-commerce, hébergement infogéré, intégrations et modules PrestaShop sur mesure.
+Édité par **[ZM40](https://zm40.com)** — catalogue de modules PrestaShop open source et pro. Atelier de développement : **[Magic Garden](https://magicgarden.fr)** (création de sites & e-commerce, hébergement infogéré, intégrations et modules PrestaShop sur mesure).
 
-- 🌱 Site : https://magicgarden.fr
-- 🛠️ Besoin d'une installation, d'une personnalisation ou d'une garantie de conformité ? → [Contact](https://magicgarden.fr)
+- 🌐 Catalogue ZM40 : https://zm40.com
+- 🛠️ Besoin d'une installation, d'une personnalisation ou d'une garantie de conformité ? → [zm40.com](https://zm40.com) (c'est Nicolas qui répond)
 
 ## Licence
 
-Distribué sous licence **[MIT](LICENSE)** : libre d'utilisation, de modification et de redistribution, y compris à titre commercial, **à condition de conserver la mention d'auteur et de licence**. Les forks et adaptations sont les bienvenus.
+Distribué sous **[GNU GPL v3](LICENSE)** : libre d'utilisation, de modification et de redistribution, **à condition de conserver la mention d'auteur, le fichier LICENSE et d'indiquer les modifications éventuelles**. Les forks et adaptations sont les bienvenus.
+
+© 2026 Nicolas Michaud — ZM40 / Magic Garden
 
 ## Contribuer
 
