@@ -46,6 +46,21 @@
         {if $rc_request->refusal_reason}
           <tr><td><strong>Motif du refus</strong></td><td>{$rc_request->refusal_reason|nl2br nofilter}</td></tr>
         {/if}
+        {if $rc_photos|@count}
+          <tr>
+            <td><strong>Photos du client</strong></td>
+            <td>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                {foreach $rc_photos as $purl}
+                  <a href="{$purl|escape:'html':'UTF-8'}" target="_blank" rel="noopener" title="Ouvrir en grand">
+                    <img src="{$purl|escape:'html':'UTF-8'}" alt="Photo rétractation" loading="lazy"
+                         style="width:90px;height:90px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">
+                  </a>
+                {/foreach}
+              </div>
+            </td>
+          </tr>
+        {/if}
       </table>
     </div>
 

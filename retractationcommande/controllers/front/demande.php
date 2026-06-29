@@ -16,6 +16,7 @@ if (!defined('_PS_VERSION_')) {
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationDelai.php';
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationRequest.php';
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPdf.php';
+require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPhoto.php';
 
 class RetractationCommandeDemandeModuleFrontController extends ModuleFrontController
 {
@@ -126,6 +127,8 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             'rc_today' => date('d/m/Y'),
             'rc_token' => $this->module->getOrderToken($order),
             'rc_ajax_url' => $this->context->link->getModuleLink('retractationcommande', 'demande', []),
+            'rc_allow_photos' => (bool) Configuration::get('RETRACTATION_ALLOW_PHOTOS'),
+            'rc_photos_max' => RetractationPhoto::MAX_FILES,
         ]);
 
         header('Content-Type: application/json');
@@ -222,6 +225,16 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             $this->ajaxFail($this->module->l('Impossible d\'enregistrer la demande. Merci de contacter le service client.', 'demande'));
         }
 
+        // Photos jointes par le client (facultatif, jamais bloquant) : validées
+        // par le système natif PrestaShop puis re-encodées (purge tout payload).
+        if (Configuration::get('RETRACTATION_ALLOW_PHOTOS')) {
+            $photos = RetractationPhoto::storeUploaded('rc_photos', (int) $request->id);
+            if ($photos) {
+                $request->photos = json_encode($photos, JSON_UNESCAPED_UNICODE);
+                $request->update();
+            }
+        }
+
         // Accusé de réception PDF (obligatoire : dépôt via le site, L221-21 al.3)
         // Page 2 : rappel des droits (et PDF multi-pages => affiché en icône
         // de pièce jointe par Apple Mail au lieu d'être prévisualisé en ligne).
@@ -265,6 +278,15 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
         $line2 = trim(Configuration::get('PS_SHOP_CODE') . ' ' . Configuration::get('PS_SHOP_CITY'));
 
         return implode(', ', array_filter([$line1, $line2]));
+    }
+
+    /**
+     * Adresse de retour configurée (centre logistique…), si renseignée et
+     * distincte de l'adresse boutique. Vide sinon (l'adresse boutique suffit).
+     */
+    protected function getReturnAddress()
+    {
+        return trim((string) Configuration::get('RETRACTATION_RETURN_ADDRESS'));
     }
 
     /**
@@ -325,6 +347,7 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             'rc_shop_name' => Configuration::get('PS_SHOP_NAME'),
             'rc_shop_address' => $this->getShopAddress(),
             'rc_shop_email' => Configuration::get('PS_SHOP_EMAIL'),
+            'rc_return_address' => $this->getReturnAddress(),
         ]);
 
         return $this->context->smarty->fetch('module:retractationcommande/views/templates/front/pdf-accuse.tpl');

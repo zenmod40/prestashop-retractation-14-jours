@@ -39,7 +39,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.4.3';
+        $this->version = '1.4.4';
         $this->author = 'Magic Garden';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -73,6 +73,8 @@ class RetractationCommande extends Module
             && Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', '')
             && Configuration::updateValue('RETRACTATION_PROCEDURE_TEXT', $this->getDefaultProcedureText(), true)
             && Configuration::updateValue('RETRACTATION_CUSTOM_CSS', '', true)
+            && Configuration::updateValue('RETRACTATION_ALLOW_PHOTOS', 1)
+            && Configuration::updateValue('RETRACTATION_RETURN_ADDRESS', '', true)
             && $this->installDefaultStateMapping();
     }
 
@@ -98,7 +100,7 @@ class RetractationCommande extends Module
             'RETRACTATION_HIDE_NATIVE_FORM', 'RETRACTATION_DELAY_DAYS', 'RETRACTATION_LINK_LABEL',
             'RETRACTATION_SHOW_FOOTER_LINK', 'RETRACTATION_DELIVERED_STATES', 'RETRACTATION_SHIPPED_STATES', 'RETRACTATION_BLOCKED_STATES',
             'RETRACTATION_EXCLUDED_CATS', 'RETRACTATION_EXCLUDED_PRODUCTS', 'RETRACTATION_PROCEDURE_TEXT',
-            'RETRACTATION_CUSTOM_CSS',
+            'RETRACTATION_CUSTOM_CSS', 'RETRACTATION_ALLOW_PHOTOS', 'RETRACTATION_RETURN_ADDRESS',
         ] as $key) {
             Configuration::deleteByName($key);
         }
@@ -134,6 +136,7 @@ class RetractationCommande extends Module
                 `legal_deadline` DATETIME DEFAULT NULL,
                 `within_deadline` TINYINT(1) NOT NULL DEFAULT 1,
                 `pdf_filename` VARCHAR(255) DEFAULT NULL,
+                `photos` TEXT,
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_retractation_request`),
@@ -156,6 +159,7 @@ class RetractationCommande extends Module
             'reference' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `reference` VARCHAR(16) NOT NULL DEFAULT \'\' AFTER `id_order_return`',
             'products_snapshot' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `products_snapshot` TEXT AFTER `refusal_reason`',
             'shipping_phase' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `shipping_phase` VARCHAR(16) NOT NULL DEFAULT \'pending\' AFTER `delivery_date`',
+            'photos' => 'ALTER TABLE `' . _DB_PREFIX_ . 'retractation_request` ADD `photos` TEXT AFTER `pdf_filename`',
         ];
         foreach ($migrations as $column => $sql) {
             if (!in_array($column, $existing, true) && !Db::getInstance()->execute($sql)) {
@@ -379,6 +383,8 @@ class RetractationCommande extends Module
                 Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', $this->sanitizeIdList(Tools::getValue('RETRACTATION_EXCLUDED_PRODUCTS')));
                 Configuration::updateValue('RETRACTATION_PROCEDURE_TEXT', Tools::getValue('RETRACTATION_PROCEDURE_TEXT'), true);
                 Configuration::updateValue('RETRACTATION_CUSTOM_CSS', Tools::getValue('RETRACTATION_CUSTOM_CSS'), true);
+                Configuration::updateValue('RETRACTATION_ALLOW_PHOTOS', (int) Tools::getValue('RETRACTATION_ALLOW_PHOTOS'));
+                Configuration::updateValue('RETRACTATION_RETURN_ADDRESS', Tools::getValue('RETRACTATION_RETURN_ADDRESS'), true);
                 $output .= $this->displayConfirmation($this->l('Configuration enregistrée.'));
             }
         }
@@ -408,7 +414,6 @@ class RetractationCommande extends Module
             . $this->renderAdminHeader()
             . $this->renderUpdateNotice()
             . $this->renderTabs($activeTab)
-            . $this->renderEcosystem()
             . $this->renderCredits();
     }
 
@@ -641,6 +646,13 @@ HTML;
             ['id' => 'rc-tab-cgv', 'label' => $this->l('Clause CGV'), 'icon' => 'icon-file-text', 'content' => $this->renderCgvPanel()],
         ];
 
+        // Onglet « Modules ZM40 » (écosystème) — ajouté uniquement si le feed
+        // renvoie des modules (fail-silent : pas d'onglet vide si réseau OFF).
+        $ecosystem = $this->renderEcosystem();
+        if ($ecosystem !== '') {
+            $tabs[] = ['id' => 'rc-tab-modules', 'label' => $this->l('Modules ZM40'), 'icon' => 'icon-th-large', 'content' => $ecosystem];
+        }
+
         $nav = '<ul class="nav nav-tabs" id="rc-config-tabs">';
         $panes = '<div class="tab-content" style="padding-top:15px;">';
         foreach ($tabs as $t) {
@@ -753,6 +765,16 @@ HTML;
                         ],
                     ],
                     [
+                        'type' => 'switch',
+                        'label' => $this->l('Autoriser les photos'),
+                        'name' => 'RETRACTATION_ALLOW_PHOTOS',
+                        'desc' => $this->l('Propose au client de joindre des photos (état du produit et de son emballage) lors de la demande. Facultatif et jamais bloquant pour le client. Les photos sont validées et ré-encodées par le système d\'images de PrestaShop, puis stockées hors d\'accès direct et consultables en back-office.'),
+                        'values' => [
+                            ['id' => 'ap_on', 'value' => 1, 'label' => $this->l('Oui')],
+                            ['id' => 'ap_off', 'value' => 0, 'label' => $this->l('Non')],
+                        ],
+                    ],
+                    [
                         'type' => 'categories',
                         'label' => $this->l('Catégories exclues'),
                         'name' => 'categoryBox',
@@ -769,6 +791,13 @@ HTML;
                         'label' => $this->l('Produits exclus'),
                         'name' => 'rc_excluded_products_html',
                         'html_content' => $this->renderProductPicker(),
+                    ],
+                    [
+                        'type' => 'textarea',
+                        'label' => $this->l('Adresse de retour'),
+                        'name' => 'RETRACTATION_RETURN_ADDRESS',
+                        'rows' => 4,
+                        'desc' => $this->l('Adresse où le client renvoie les produits, si elle diffère de l\'adresse de la boutique (centre logistique, entrepôt, prestataire…). Affichée sur l\'accusé de réception PDF et dans la procédure de retour. Laissez vide pour utiliser l\'adresse de la boutique.'),
                     ],
                     [
                         'type' => 'textarea',
@@ -806,6 +835,8 @@ HTML;
             'RETRACTATION_ALLOW_UNDELIVERED' => Tools::getValue('RETRACTATION_ALLOW_UNDELIVERED', Configuration::get('RETRACTATION_ALLOW_UNDELIVERED')),
             'RETRACTATION_PROCEDURE_TEXT' => Tools::getValue('RETRACTATION_PROCEDURE_TEXT', Configuration::get('RETRACTATION_PROCEDURE_TEXT')),
             'RETRACTATION_CUSTOM_CSS' => Tools::getValue('RETRACTATION_CUSTOM_CSS', Configuration::get('RETRACTATION_CUSTOM_CSS')),
+            'RETRACTATION_ALLOW_PHOTOS' => Tools::getValue('RETRACTATION_ALLOW_PHOTOS', Configuration::get('RETRACTATION_ALLOW_PHOTOS')),
+            'RETRACTATION_RETURN_ADDRESS' => Tools::getValue('RETRACTATION_RETURN_ADDRESS', Configuration::get('RETRACTATION_RETURN_ADDRESS')),
         ];
 
         return $helper->generateForm([$form]) . $this->renderCatTreeTweaks();

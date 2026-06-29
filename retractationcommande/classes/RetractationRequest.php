@@ -48,6 +48,8 @@ class RetractationRequest extends ObjectModel
     public $within_deadline = 1;
     /** @var string|null fichier PDF de l'accusé de réception */
     public $pdf_filename;
+    /** @var string|null JSON des photos jointes par le client (noms de fichiers) */
+    public $photos;
     /** @var string */
     public $date_add;
     /** @var string */
@@ -71,6 +73,7 @@ class RetractationRequest extends ObjectModel
             'legal_deadline' => ['type' => self::TYPE_DATE, 'allow_null' => true],
             'within_deadline' => ['type' => self::TYPE_BOOL, 'validate' => 'isBool'],
             'pdf_filename' => ['type' => self::TYPE_STRING, 'size' => 255],
+            'photos' => ['type' => self::TYPE_STRING],
             'date_add' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
             'date_upd' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
         ],

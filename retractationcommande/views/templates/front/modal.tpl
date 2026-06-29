@@ -54,7 +54,7 @@
   </table>
 </div>
 
-<form class="retractation-form" method="post" action="{$rc_ajax_url}">
+<form class="retractation-form" method="post" action="{$rc_ajax_url}" enctype="multipart/form-data">
   <input type="hidden" name="action" value="confirm">
   <input type="hidden" name="id_order" value="{$rc_order->id|intval}">
   <input type="hidden" name="rtoken" value="{$rc_token}">
@@ -106,6 +106,19 @@
     </label>
     <textarea name="rc_message" id="rc_message" maxlength="2000" class="form-control"></textarea>
   </div>
+
+  {if $rc_allow_photos}
+    <div class="form-group retractation-photos-field">
+      <label for="rc_photos">
+        {l s='Photos (facultatif) — pour montrer l\'état du produit et de son emballage' mod='retractationcommande'}
+      </label>
+      <input type="file" name="rc_photos[]" id="rc_photos" class="form-control-file"
+             accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+      <small class="form-text text-muted">
+        {l s='Jusqu\'à' mod='retractationcommande'} {$rc_photos_max} {l s='photos, 4 Mo maximum chacune (JPG, PNG, WebP, GIF). Ce n\'est pas obligatoire.' mod='retractationcommande'}
+      </small>
+    </div>
+  {/if}
 
   <div class="retractation-actions">
     <button type="button" class="btn btn-secondary retractation-cancel">

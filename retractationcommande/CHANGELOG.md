@@ -2,6 +2,15 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.4.4] — 2026-06-29
+
+### Ajouté
+- **Photos jointes par le client** : option permettant au client de joindre des photos (état du produit et de son emballage) lors de la demande de rétractation. Facultatif et jamais bloquant. Chaque image est validée par le système natif PrestaShop (`ImageManager`) **puis ré-encodée** (reconstruction à partir des pixels, ce qui détruit tout contenu malveillant éventuellement embarqué), stockée hors d'accès direct et consultable en back-office sur la fiche de la demande. Activable depuis la configuration (« Autoriser les photos »). Formats acceptés : JPG, PNG, WebP, GIF (jamais de SVG) ; 4 photos maximum, 4 Mo chacune.
+- **Adresse de retour** : nouveau champ de configuration pour indiquer une adresse de retour distincte de celle de la boutique (centre logistique, entrepôt, prestataire…). Elle s'affiche sur l'accusé de réception PDF et dans la procédure de retour envoyée au client à l'acceptation. Laissé vide, l'adresse de la boutique est utilisée comme avant.
+
+### Modifié
+- La liste des autres modules ZM40 (écosystème) passe dans un **onglet dédié « Modules ZM40 »** de la page de configuration, au lieu d'un bloc en bas de page.
+
 ## [1.4.3] — 2026-06-25
 
 ### Ajouté

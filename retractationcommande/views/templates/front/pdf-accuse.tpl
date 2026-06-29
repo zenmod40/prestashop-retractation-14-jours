@@ -37,6 +37,15 @@
   {/if}
 </table>
 
+{if $rc_return_address}
+  <table width="100%" cellpadding="3" style="font-size: 9.5pt; margin-top: 6px; border-top: 1px solid #eee;">
+    <tr>
+      <td width="20%"><strong>{l s='Adresse de retour' mod='retractationcommande'}</strong></td>
+      <td width="80%">{$rc_return_address|escape:'html':'UTF-8'|nl2br nofilter}</td>
+    </tr>
+  </table>
+{/if}
+
 <p style="font-size: 10pt;">
   {l s='Conformément à l\'article L221-21 du Code de la consommation, nous accusons réception de votre demande de rétractation' mod='retractationcommande'}
   <strong>{$rc_request_ref}</strong>
