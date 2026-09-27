@@ -12,6 +12,7 @@ require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationDelai.p
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationRequest.php';
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPdf.php';
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPhoto.php';
+require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationWorkflow.php';
 
 class AdminRetractationController extends ModuleAdminController
 {
@@ -230,64 +231,14 @@ class AdminRetractationController extends ModuleAdminController
     protected function processAccept()
     {
         $request = $this->loadRequestOrFail();
-        if (!$request) {
+        if (!$request || !$this->runWorkflow('accept', $request)) {
             return;
         }
 
-        $request->status = RetractationRequest::STATUS_ACCEPTED;
-        $request->update();
-
-        // Phase figée au dépôt (repli sur delivery_date pour les anciennes demandes).
         $phase = $request->shipping_phase ?: ($request->delivery_date ? 'delivered' : 'pending');
-
         if ($phase === 'pending') {
-            // Commande non expédiée : annulation, aucun retour produit.
-            $this->sendCustomerEmail(
-                $request,
-                'retractation_annulation',
-                $this->l('Votre rétractation est validée — commande annulée avant expédition')
-            );
             $this->confirmations[] = $this->l('Demande validée (commande non expédiée) : le client a été informé de l\'annulation. Pensez à annuler l\'expédition et à effectuer le remboursement depuis la fiche commande, puis marquez la demande comme remboursée.');
         } else {
-            // Livrée ou en cours d'acheminement : procédure de retour.
-            $request->setNativeReturnState(RetractationCommande::OR_STATE_WAITING_PACKAGE);
-
-            $order = new Order((int) $request->id_order);
-            $customer = new Customer((int) $request->id_customer);
-
-            // Procédure (texte du jeu de règles du client : par défaut ou par
-            // groupe) + adresse de retour configurée (centre logistique…) si
-            // renseignée — ajoutée au contenu sans toucher aux templates.
-            $procedure = (string) RetractationRules::forCustomer((int) $request->id_customer)['procedure_text'];
-            $returnAddress = trim((string) Configuration::get('RETRACTATION_RETURN_ADDRESS'));
-            if ($returnAddress !== '') {
-                $procedure .= '<p style="margin-top:14px"><strong>' . $this->l('Adresse de retour') . ' :</strong><br>'
-                    . nl2br(htmlspecialchars($returnAddress, ENT_QUOTES, 'UTF-8')) . '</p>';
-            }
-            // Instructions spécifiques (config) — affichées dans l'e-mail ET sur le bon de retour.
-            $instructions = trim((string) Configuration::get('RETRACTATION_RETURN_INSTRUCTIONS'));
-            if ($instructions !== '') {
-                $procedure .= '<p style="margin-top:14px"><strong>' . $this->l('Instructions') . ' :</strong><br>' . $instructions . '</p>';
-            }
-
-            // Bon de retour PDF joint + consigne d'impression / collage sur le colis.
-            $attachment = null;
-            if (Validate::isLoadedObject($order) && Validate::isLoadedObject($customer)) {
-                $attachment = $this->buildReturnSlipAttachment($request, $order, $customer);
-            }
-            if ($attachment) {
-                $procedure .= '<p style="margin-top:14px; padding:10px 12px; border:2px solid #2e7d32; background:#eef5ee; color:#1b4d20;"><strong>'
-                    . $this->l('Un bon de retour est joint à cet e-mail (PDF). Imprimez-le et collez-le sur l\'extérieur du colis : sans ce bon, votre retour ne pourra pas être accepté par notre service logistique.')
-                    . '</strong></p>';
-            }
-
-            $this->sendCustomerEmail(
-                $request,
-                'retractation_procedure',
-                $this->l('Votre rétractation est validée — procédure de retour'),
-                ['{procedure}' => $procedure],
-                $attachment
-            );
             $this->confirmations[] = ($phase === 'shipped')
                 ? $this->l('Demande validée (commande en cours d\'acheminement) : la procédure de retour a été envoyée au client. Il pourra refuser le colis ou le renvoyer.')
                 : $this->l('Demande validée : la procédure de retour a été envoyée au client.');
@@ -300,30 +251,9 @@ class AdminRetractationController extends ModuleAdminController
     protected function processRefuse()
     {
         $request = $this->loadRequestOrFail();
-        if (!$request) {
-            return;
+        if ($request && $this->runWorkflow('refuse', $request, Tools::getValue('refusal_reason'))) {
+            $this->confirmations[] = $this->l('Demande refusée : le client a été informé du motif.');
         }
-
-        $reason = trim((string) Tools::getValue('refusal_reason'));
-        if (!$reason) {
-            $this->errors[] = $this->l('Merci d\'indiquer le motif du refus (il sera communiqué au client).');
-
-            return;
-        }
-
-        $request->status = RetractationRequest::STATUS_REFUSED;
-        $request->refusal_reason = $reason;
-        $request->update();
-        $request->setNativeReturnState(RetractationCommande::OR_STATE_DENIED);
-
-        $this->sendCustomerEmail(
-            $request,
-            'retractation_refus',
-            $this->l('Votre demande de rétractation'),
-            ['{reason}' => nl2br(htmlspecialchars($reason))]
-        );
-
-        $this->confirmations[] = $this->l('Demande refusée : le client a été informé du motif.');
     }
 
     /**
@@ -333,26 +263,43 @@ class AdminRetractationController extends ModuleAdminController
     protected function processRefund()
     {
         $request = $this->loadRequestOrFail();
-        if (!$request) {
-            return;
+        if ($request && $this->runWorkflow('markRefunded', $request)) {
+            $this->confirmations[] = $this->l('Demande marquée comme remboursée, le client a été informé. Pensez à effectuer le remboursement réel depuis la fiche commande si ce n\'est pas déjà fait.');
+        }
+    }
+
+    /**
+     * Exécute un geste de RetractationWorkflow et traduit ses codes en messages.
+     *
+     * @return bool true si l'état a changé (même avec avertissements)
+     */
+    protected function runWorkflow($action, RetractationRequest $request, $reason = null)
+    {
+        $idEmployee = (int) $this->context->employee->id;
+        try {
+            $result = ($action === 'refuse')
+                ? RetractationWorkflow::refuse($request, $reason, $idEmployee, 'bo')
+                : RetractationWorkflow::$action($request, $idEmployee, 'bo');
+        } catch (RetractationWorkflowException $e) {
+            $messages = [
+                'bad_status' => $this->l('Cette demande a déjà été traitée : aucune action effectuée, aucun e-mail envoyé.'),
+                'reason_required' => $this->l('Merci d\'indiquer le motif du refus (il sera communiqué au client).'),
+                'reason_invalid' => $this->l('Le motif contient des caractères non autorisés.'),
+                'save_failed' => $this->l('Impossible d\'enregistrer le nouvel état : aucun e-mail envoyé.'),
+            ];
+            $this->errors[] = isset($messages[$e->getMessage()]) ? $messages[$e->getMessage()] : $e->getMessage();
+
+            return false;
         }
 
-        $request->status = RetractationRequest::STATUS_REFUNDED;
-        $request->update();
-        $request->setNativeReturnState(RetractationCommande::OR_STATE_COMPLETED);
+        if (in_array('pdf_failed', $result['warnings'], true)) {
+            $this->warnings[] = $this->l('Le bon de retour PDF n\'a pas pu être généré : l\'e-mail est parti sans pièce jointe.');
+        }
+        if (in_array('mail_failed', $result['warnings'], true)) {
+            $this->warnings[] = $this->l('L\'état a été enregistré, mais l\'e-mail au client n\'a pas pu être envoyé.');
+        }
 
-        $this->sendCustomerEmail(
-            $request,
-            'retractation_remboursee',
-            $this->l('Votre rétractation a été remboursée'),
-            [
-                '{refund_intro}' => $request->delivery_date
-                    ? $this->l('le produit a été réceptionné et contrôlé, et')
-                    : $this->l('votre commande a été annulée avant expédition, et'),
-            ]
-        );
-
-        $this->confirmations[] = $this->l('Demande marquée comme remboursée, le client a été informé. Pensez à effectuer le remboursement réel depuis la fiche commande si ce n\'est pas déjà fait.');
+        return true;
     }
 
     protected function processDownloadPdf()
@@ -399,113 +346,5 @@ class AdminRetractationController extends ModuleAdminController
         header('Content-Length: ' . filesize($path));
         readfile($path);
         exit;
-    }
-
-    protected function sendCustomerEmail(RetractationRequest $request, $template, $subject, array $extraVars = [], $attachment = null)
-    {
-        $order = new Order((int) $request->id_order);
-        $customer = new Customer((int) $request->id_customer);
-        if (!Validate::isLoadedObject($order) || !Validate::isLoadedObject($customer)) {
-            return;
-        }
-
-        $vars = array_merge([
-            '{firstname}' => $customer->firstname,
-            '{lastname}' => $customer->lastname,
-            '{order_ref}' => $order->reference,
-            '{request_ref}' => $request->reference,
-            '{request_id}' => (int) $request->id,
-            '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
-        ], $extraVars);
-
-        // Retour commercial (jeu par groupe) : un seul template neutre, sans
-        // mention du droit de rétractation ; titre, intro et corps selon l'étape.
-        if (!RetractationRules::forCustomer((int) $customer->id)['legal']) {
-            $refs = [$request->reference, $order->reference];
-            switch ($template) {
-                case 'retractation_annulation':
-                    $subject = $this->l('Votre demande de retour est acceptée — commande annulée avant expédition');
-                    $intro = vsprintf($this->l('Votre demande %s concernant la commande %s a été acceptée.'), $refs);
-                    $body = '<p>' . $this->l('Votre commande n\'ayant pas encore été expédiée, aucun retour de produit n\'est nécessaire : l\'expédition est annulée et le remboursement vous sera adressé par le même moyen de paiement.') . '</p>';
-                    break;
-                case 'retractation_refus':
-                    $subject = $this->l('Votre demande de retour');
-                    $intro = vsprintf($this->l('Votre demande de retour %s concernant la commande %s n\'a pas pu être acceptée.'), $refs);
-                    $body = '<p><strong>' . $this->l('Motif') . '</strong><br>' . ($vars['{reason}'] ?? '') . '</p>';
-                    break;
-                case 'retractation_remboursee':
-                    $subject = $this->l('Votre retour a été remboursé');
-                    $intro = vsprintf($this->l('Votre demande de retour %s concernant la commande %s a été remboursée.'), $refs);
-                    $body = '<p>' . $this->l('Le remboursement a été effectué par le même moyen de paiement que celui de la commande.') . '</p>';
-                    break;
-                default: // retractation_procedure
-                    $subject = $this->l('Votre demande de retour est acceptée — procédure de retour');
-                    $intro = vsprintf($this->l('Votre demande de retour %s concernant la commande %s a été vérifiée et acceptée.'), $refs);
-                    $body = (string) ($vars['{procedure}'] ?? '');
-            }
-            $template = 'retour_notification';
-            $vars['{title}'] = $subject;
-            $vars['{intro}'] = $intro;
-            $vars['{body}'] = $body;
-        }
-
-        Mail::Send(
-            RetractationCommande::getMailLangId((int) $order->id_lang, $template),
-            $template,
-            $subject . ' - ' . $order->reference,
-            $vars,
-            $customer->email,
-            $customer->firstname . ' ' . $customer->lastname,
-            null,
-            null,
-            $attachment,
-            null,
-            _PS_MODULE_DIR_ . 'retractationcommande/mails/',
-            false,
-            (int) $order->id_shop
-        );
-    }
-
-    /**
-     * Génère le PDF « bon de retour » (à imprimer et coller sur le colis) et
-     * retourne une pièce jointe prête pour Mail::Send, ou null si indisponible.
-     */
-    protected function buildReturnSlipAttachment(RetractationRequest $request, Order $order, Customer $customer)
-    {
-        $products = RetractationRequest::decodeSnapshot($request->products_snapshot);
-        $returnAddress = trim((string) Configuration::get('RETRACTATION_RETURN_ADDRESS'));
-        $instructions = trim((string) Configuration::get('RETRACTATION_RETURN_INSTRUCTIONS'));
-
-        $this->context->smarty->assign([
-            'rc_shop_name' => Configuration::get('PS_SHOP_NAME'),
-            'rc_customer_name' => trim($customer->firstname . ' ' . $customer->lastname),
-            'rc_order_ref' => $order->reference,
-            'rc_request_ref' => $request->reference,
-            'rc_date' => Tools::displayDate(date('Y-m-d H:i:s'), true),
-            'rc_products' => is_array($products) ? $products : [],
-            'rc_return_address' => $returnAddress !== '' ? nl2br(htmlspecialchars($returnAddress, ENT_QUOTES, 'UTF-8')) : '',
-            'rc_instructions' => $instructions !== '' ? $instructions : '',
-        ]);
-
-        // display() (et non fetch('module:...')) pour une résolution fiable du
-        // template depuis le contexte back-office.
-        $html = $this->module->display(
-            _PS_MODULE_DIR_ . 'retractationcommande/retractationcommande.php',
-            'views/templates/front/pdf-bon-retour.tpl'
-        );
-        $filename = RetractationPdf::generate($html, (int) $request->id, null, 'bon_retour');
-        if (!$filename) {
-            return null;
-        }
-        $path = RetractationPdf::getPath($filename);
-        if (!$path) {
-            return null;
-        }
-
-        return [
-            'content' => file_get_contents($path),
-            'name' => 'bon-de-retour-' . $order->reference . '.pdf',
-            'mime' => 'application/pdf',
-        ];
     }
 }

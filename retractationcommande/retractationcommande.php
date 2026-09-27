@@ -24,6 +24,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once __DIR__ . '/classes/RetractationDelai.php';
 require_once __DIR__ . '/classes/RetractationRequest.php';
+require_once __DIR__ . '/classes/RetractationWorkflow.php';
 require_once __DIR__ . '/lib/zm40/Zm40CommonRc.php';
 
 class RetractationCommande extends Module
@@ -39,7 +40,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.5.0';
+        $this->version = '1.6.0';
         $this->author = 'ZM40';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -107,7 +108,7 @@ class RetractationCommande extends Module
             Configuration::deleteByName($key);
         }
 
-        // La table retractation_request est volontairement conservée :
+        // Les tables retractation_request(_history) sont volontairement conservées :
         // les demandes de rétractation sont des preuves légales et doivent
         // survivre à une réinstallation du module.
         return $this->uninstallTab()
@@ -116,7 +117,7 @@ class RetractationCommande extends Module
 
     protected function installDb()
     {
-        return $this->createDbTable() && $this->migrateDbColumns();
+        return $this->createDbTable() && $this->migrateDbColumns() && self::createHistoryTable();
     }
 
     protected function createDbTable()
@@ -145,6 +146,27 @@ class RetractationCommande extends Module
                 KEY `id_order` (`id_order`),
                 KEY `id_customer` (`id_customer`),
                 UNIQUE KEY `reference` (`reference`)
+            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8mb4');
+    }
+
+    /**
+     * Historique des changements d'état (qui, quand, depuis où). Partagée
+     * avec upgrade-1.6.0.php ; conservée à la désinstallation comme les demandes.
+     */
+    public static function createHistoryTable()
+    {
+        return Db::getInstance()->execute('
+            CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'retractation_request_history` (
+                `id_retractation_request_history` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `id_retractation_request` INT UNSIGNED NOT NULL,
+                `status_from` VARCHAR(32) NOT NULL,
+                `status_to` VARCHAR(32) NOT NULL,
+                `id_employee` INT UNSIGNED NOT NULL DEFAULT 0,
+                `source` VARCHAR(16) NOT NULL DEFAULT \'bo\',
+                `comment` TEXT NULL,
+                `date_add` DATETIME NOT NULL,
+                PRIMARY KEY (`id_retractation_request_history`),
+                KEY `id_retractation_request` (`id_retractation_request`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8mb4');
     }
 

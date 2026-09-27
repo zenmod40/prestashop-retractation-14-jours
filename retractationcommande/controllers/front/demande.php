@@ -17,6 +17,7 @@ require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationDelai.p
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationRequest.php';
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPdf.php';
 require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationPhoto.php';
+require_once _PS_MODULE_DIR_ . 'retractationcommande/classes/RetractationWorkflow.php';
 
 class RetractationCommandeDemandeModuleFrontController extends ModuleFrontController
 {
@@ -219,13 +220,15 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
         $request->legal_deadline = $deadline ? $deadline->format('Y-m-d H:i:s') : null;
         $request->within_deadline = 1; // bouton visible => dépôt dans la fenêtre légale
 
-        // Retour natif PrestaShop (SAV > Retours produits)
-        if (Configuration::get('RETRACTATION_CREATE_ORDER_RETURN')) {
-            $request->createNativeOrderReturn($order, $selection);
-        }
-
         if (!$request->add()) {
             $this->ajaxFail($this->module->l('Impossible d\'enregistrer la demande. Merci de contacter le service client.', 'demande'));
+        }
+        RetractationWorkflow::logHistory($request->id, '', RetractationRequest::STATUS_PENDING, 0, 'front');
+
+        // Retour natif PrestaShop (SAV > Retours produits), créé après la
+        // demande : un échec d'enregistrement ne laisse pas de retour orphelin.
+        if (Configuration::get('RETRACTATION_CREATE_ORDER_RETURN') && $request->createNativeOrderReturn($order, $selection)) {
+            $request->update();
         }
 
         // Photos jointes par le client (facultatif, jamais bloquant) : validées

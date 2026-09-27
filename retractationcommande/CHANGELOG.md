@@ -2,6 +2,18 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.6.0] — 2026-09-27
+
+### Ajouté
+- **Gestes SAV appelables hors back-office.** Accepter, refuser et marquer remboursée une demande passent désormais par une classe publique, `RetractationWorkflow`, que le back-office et l'application Régie (via son module `regiebridge`) appellent tous deux : mêmes e-mails, même bon de retour PDF, même synchronisation du retour natif, quel que soit le point d'entrée. La classe fonctionne depuis un contrôleur front ou la ligne de commande, l'employé étant passé en paramètre.
+- **Historique des demandes.** Nouvelle table `retractation_request_history` : chaque changement d'état y est consigné avec l'employé, l'origine (back-office, Régie, dépôt client) et le motif d'un refus. Créée par le script de mise à jour pour les installations existantes ; les demandes déjà enregistrées ne sont pas touchées.
+
+### Corrigé
+- **Double geste.** Le contrôle « on n'accepte ou ne refuse qu'une demande à vérifier » n'existait que dans l'affichage : un double clic, ou un formulaire resté ouvert, renvoyait les e-mails et pouvait repasser une demande remboursée à l'état « acceptée ». La transition est maintenant contrôlée en base, dans la requête d'écriture elle-même : une demande déjà traitée n'est plus modifiée et aucun e-mail ne part. Le back-office affiche une erreur lisible.
+- **E-mail « remboursée » d'une commande en cours d'acheminement.** Son introduction était choisie selon la date de livraison, absente pour une demande déposée pendant le transport : le client lisait « votre commande a été annulée avant expédition ». Elle suit désormais la phase d'expédition figée au dépôt, comme l'e-mail de validation.
+- **Retour natif orphelin.** Le retour PrestaShop était créé avant la demande ; si l'enregistrement de la demande échouait, il restait seul dans SAV > Retours produits. La demande est désormais enregistrée d'abord.
+- Le back-office signale quand l'e-mail au client n'a pas pu partir ou quand le bon de retour PDF n'a pas pu être généré, au lieu de confirmer en silence.
+
 ## [1.5.0] — 2026-09-03
 
 ### Ajouté
