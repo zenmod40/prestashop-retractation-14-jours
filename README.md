@@ -1,6 +1,7 @@
 # Rétractation Commande — Module PrestaShop 1.7 / 8 / 9
 
-[![Téléchargements](https://img.shields.io/github/downloads/zenmod40/prestashop-retractation-14-jours/total.svg)](https://github.com/zenmod40/prestashop-retractation-14-jours/releases) [![Version](https://img.shields.io/github/v/release/zenmod40/prestashop-retractation-14-jours)](https://github.com/zenmod40/prestashop-retractation-14-jours/releases/latest)
+![PrestaShop 1.7 → 9](https://img.shields.io/badge/PrestaShop-1.7%20%E2%86%92%209-blue) [![Téléchargements](https://img.shields.io/github/downloads/zenmod40/prestashop-retractation-14-jours/total.svg)](https://github.com/zenmod40/prestashop-retractation-14-jours/releases) [![Version](https://img.shields.io/github/v/release/zenmod40/prestashop-retractation-14-jours)](https://github.com/zenmod40/prestashop-retractation-14-jours/releases/latest)
+![License: OSL 3.0](https://img.shields.io/badge/License-OSL--3.0-blue)
 
 > **[Page du module sur zm40.com](https://zm40.com/retractation)** · [Documentation](https://zm40.com/retractation/documentation) · [Changelog](https://zm40.com/retractation/changelog)
 
