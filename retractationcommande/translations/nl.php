@@ -204,3 +204,5 @@ $_MODULE['<{retractationcommande}prestashop>demande_88c61ac25a3c53857ec7f8ce7bf4
 $_MODULE['<{retractationcommande}prestashop>demande_58a4ec92a799d3a1e9b1582dca393a99'] = 'Reden';
 $_MODULE['<{retractationcommande}prestashop>demande_b89e86f1db1f3b8bac43811f0380ffcd'] = 'Nieuwe commerciële retouraanvraag te beoordelen';
 $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed53ede40'] = 'Geen enkele bestelling komt overeen met deze gegevens. Controleer het e-mailadres en de referentie (beide staan op uw orderbevestiging).';
+$_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'De herroeping van deze bestelling verloopt via de verkoper: gebruik de link in uw e-mail met de orderbevestiging.';
+$_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'De herroeping van deze bestelling verloopt via de verkoper: gebruik de link in uw e-mail met de orderbevestiging, of de bestelpagina in uw account.';

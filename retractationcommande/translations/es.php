@@ -204,3 +204,5 @@ $_MODULE['<{retractationcommande}prestashop>demande_88c61ac25a3c53857ec7f8ce7bf4
 $_MODULE['<{retractationcommande}prestashop>demande_58a4ec92a799d3a1e9b1582dca393a99'] = 'Motivo';
 $_MODULE['<{retractationcommande}prestashop>demande_b89e86f1db1f3b8bac43811f0380ffcd'] = 'Nueva solicitud de devolución comercial por revisar';
 $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed53ede40'] = 'Ningún pedido coincide con estos datos. Compruebe la dirección de correo electrónico y la referencia (ambas figuran en su correo de confirmación del pedido).';
+$_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'El desistimiento de este pedido se gestiona con el vendedor: utilice el enlace de su correo electrónico de confirmación del pedido.';
+$_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'El desistimiento de este pedido se gestiona con el vendedor: utilice el enlace de su correo electrónico de confirmación del pedido, o la página del pedido en su cuenta.';

@@ -204,3 +204,5 @@ $_MODULE['<{retractationcommande}prestashop>demande_88c61ac25a3c53857ec7f8ce7bf4
 $_MODULE['<{retractationcommande}prestashop>demande_58a4ec92a799d3a1e9b1582dca393a99'] = 'Reason';
 $_MODULE['<{retractationcommande}prestashop>demande_b89e86f1db1f3b8bac43811f0380ffcd'] = 'New commercial return request to review';
 $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed53ede40'] = 'No order matches this information. Check the email address and the reference (both shown on your order confirmation email).';
+$_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'Withdrawal from this order is handled by the seller: use the link in your order confirmation e-mail.';
+$_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'Withdrawal from this order is handled by the seller: use the link in your order confirmation e-mail, or the order page in your account.';

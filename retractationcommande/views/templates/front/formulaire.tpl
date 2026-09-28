@@ -137,6 +137,10 @@
                data-rtoken="{$rc_guest_order.token}">
               {l s='Se rétracter' mod='retractationcommande'}
             </a>
+          {elseif $rc_guest_order.reason == 'claimed'}
+            <p class="alert alert-info">
+              {l s='La rétractation de cette commande se fait auprès du vendeur : utilisez le lien de votre e-mail de confirmation de commande, ou la page de la commande dans votre compte.' mod='retractationcommande'}
+            </p>
           {elseif !$rc_guest_order.status_label}
             <p class="alert alert-warning">
               {l s='Cette commande n\'est pas (ou plus) éligible à la rétractation en ligne : délai légal expiré, demande déjà déposée ou commande non concernée. Pour toute question, contactez notre service client.' mod='retractationcommande'}

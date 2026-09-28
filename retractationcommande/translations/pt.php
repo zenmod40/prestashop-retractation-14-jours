@@ -204,3 +204,5 @@ $_MODULE['<{retractationcommande}prestashop>demande_88c61ac25a3c53857ec7f8ce7bf4
 $_MODULE['<{retractationcommande}prestashop>demande_58a4ec92a799d3a1e9b1582dca393a99'] = 'Motivo';
 $_MODULE['<{retractationcommande}prestashop>demande_b89e86f1db1f3b8bac43811f0380ffcd'] = 'Novo pedido de devolução comercial a verificar';
 $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed53ede40'] = 'Nenhuma encomenda corresponde a estes dados. Verifique o endereço de e-mail e a referência (ambos presentes no e-mail de confirmação da encomenda).';
+$_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'O direito de livre resolução desta encomenda é exercido junto do vendedor: utilize a ligação no seu e-mail de confirmação da encomenda.';
+$_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'O direito de livre resolução desta encomenda é exercido junto do vendedor: utilize a ligação no seu e-mail de confirmação da encomenda, ou a página da encomenda na sua conta.';

@@ -2,6 +2,14 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [Non publié]
+
+### Ajouté
+- **Hook d'éligibilité `actionRetractationcommandeEligibility`.** Un autre module peut réclamer une commande dont il traite lui-même la rétractation (par exemple une marketplace, pour les commandes de ses vendeurs) : il reçoit la commande (`order`) et écrit son nom dans `claimed_by`. La commande n'a alors ni bouton ni dépôt ici ; le formulaire invité et le dépôt en ligne renvoient le client vers le vendeur. Constante `RetractationRequest::ELIGIBILITY_HOOK`.
+
+### Corrigé
+- **Parcours invité.** La recherche d'une commande par e-mail et référence finissait en erreur 500 depuis la 1.5.0 : les règles de retour du client étaient demandées avec la ligne de la commande au lieu de la commande.
+
 ## [1.6.0] — 2026-09-27
 
 ### Ajouté

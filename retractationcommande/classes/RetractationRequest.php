@@ -16,6 +16,13 @@ require_once __DIR__ . '/RetractationRules.php';
 
 class RetractationRequest extends ObjectModel
 {
+    /**
+     * Hook d'éligibilité : un autre module peut réclamer une commande dont il traite lui-même la rétractation
+     * (par exemple une marketplace, pour les commandes de ses vendeurs). Paramètres : 'order' (Order) et 'claimed_by'
+     * (par référence) ; le module qui réclame la commande y écrit son nom. La commande n'a alors ni bouton ni dépôt ici.
+     */
+    const ELIGIBILITY_HOOK = 'actionRetractationcommandeEligibility';
+
     const STATUS_PENDING = 'pending';     // À vérifier par le SAV
     const STATUS_ACCEPTED = 'accepted';   // Conforme — procédure de retour envoyée
     const STATUS_REFUSED = 'refused';     // Non conforme (hors délai, exclusion légale…)
@@ -444,7 +451,18 @@ class RetractationRequest extends ObjectModel
             'reason' => '',
             'excluded_products' => [],
             'remaining' => [],
+            'claimed_by' => null,
         ];
+
+        // Commande réclamée par un autre module, qui en traite la rétractation : rien ici
+        $claimedBy = null;
+        Hook::exec(self::ELIGIBILITY_HOOK, ['order' => $order, 'claimed_by' => &$claimedBy]);
+        if (is_string($claimedBy) && $claimedBy !== '') {
+            $result['reason'] = 'claimed';
+            $result['claimed_by'] = $claimedBy;
+
+            return $result;
+        }
 
         if (!$order->valid && !count($order->getHistory((int) Context::getContext()->language->id))) {
             $result['reason'] = 'invalid_order';

@@ -106,6 +106,9 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
     {
         $order = $this->loadOrderOrFail();
         $eligibility = RetractationRequest::getOrderEligibility($order);
+        if ($eligibility['reason'] === 'claimed') {
+            $this->ajaxFail($this->module->l('La rétractation de cette commande se fait auprès du vendeur : utilisez le lien de votre e-mail de confirmation de commande.', 'demande'));
+        }
         if (!$eligibility['eligible']) {
             $this->ajaxFail($this->module->l('Cette commande n\'est plus éligible à la rétractation (délai légal expiré ou produits déjà en cours de rétractation).', 'demande'));
         }
@@ -149,6 +152,9 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
     {
         $order = $this->loadOrderOrFail();
         $eligibility = RetractationRequest::getOrderEligibility($order);
+        if ($eligibility['reason'] === 'claimed') {
+            $this->ajaxFail($this->module->l('La rétractation de cette commande se fait auprès du vendeur : utilisez le lien de votre e-mail de confirmation de commande.', 'demande'));
+        }
         if (!$eligibility['eligible']) {
             $this->ajaxFail($this->module->l('Cette commande n\'est plus éligible à la rétractation (délai légal expiré ou produits déjà en cours de rétractation).', 'demande'));
         }
