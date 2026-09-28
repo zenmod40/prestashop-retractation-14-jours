@@ -52,7 +52,7 @@ class RetractationCommandeFormulaireModuleFrontController extends ModuleFrontCon
                 $guestOrder = $result;
                 // La commande désigne son client : ses règles priment sur
                 // celles du visiteur anonyme.
-                $rule = RetractationRules::forOrder($guestOrder);
+                $rule = RetractationRules::forOrder(new Order((int) $guestOrder['id_order']));
             }
         }
 
