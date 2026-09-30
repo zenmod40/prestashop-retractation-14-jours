@@ -159,7 +159,8 @@ class RetractationCommandeDemandeModuleFrontController extends ModuleFrontContro
             $this->ajaxFail($this->module->l('Cette commande n\'est plus éligible à la rétractation (délai légal expiré ou produits déjà en cours de rétractation).', 'demande'));
         }
 
-        $message = trim((string) Tools::getValue('rc_message'));
+        // RC-01 : le motif est du texte brut (recopié dans le retour natif).
+        $message = Tools::substr(trim(strip_tags((string) Tools::getValue('rc_message'))), 0, 2000);
         if ($message && !Validate::isCleanHtml($message)) {
             $this->ajaxFail($this->module->l('Le message contient des caractères non autorisés.', 'demande'));
         }

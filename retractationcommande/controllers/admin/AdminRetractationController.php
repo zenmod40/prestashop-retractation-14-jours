@@ -194,6 +194,19 @@ class AdminRetractationController extends ModuleAdminController
 
     public function postProcess()
     {
+        // RC-02 : postProcess() passe avant viewAccess() ; on vérifie les droits
+        // de l'employé sur l'onglet (modification pour les gestes SAV, lecture
+        // pour les téléchargements).
+        $isAction = Tools::isSubmit('submitAcceptRetractation')
+            || Tools::isSubmit('submitRefuseRetractation')
+            || Tools::isSubmit('submitRefundRetractation');
+        $isDownload = Tools::isSubmit('downloadRetractationPdf') || Tools::isSubmit('downloadRetractationPhoto');
+        if (($isAction && !$this->access('edit')) || ($isDownload && !$this->access('view'))) {
+            $this->errors[] = $this->trans('Access denied.', [], 'Admin.Notifications.Error');
+
+            return parent::postProcess();
+        }
+
         if (Tools::isSubmit('submitAcceptRetractation')) {
             $this->processAccept();
         } elseif (Tools::isSubmit('submitRefuseRetractation')) {

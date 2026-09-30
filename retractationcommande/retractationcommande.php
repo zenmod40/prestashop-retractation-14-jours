@@ -40,7 +40,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.6.0';
+        $this->version = '1.6.1';
         $this->author = 'ZM40';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -63,6 +63,7 @@ class RetractationCommande extends Module
             && $this->registerHook('displayFooter')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('moduleRoutes')
+            && $this->registerHook('actionAdminReturnListingFieldsModifier')
             && Configuration::updateValue('RETRACTATION_SAV_EMAIL', Configuration::get('PS_SHOP_EMAIL'))
             && Configuration::updateValue('RETRACTATION_CREATE_ORDER_RETURN', 1)
             && Configuration::updateValue('RETRACTATION_ALLOW_UNDELIVERED', 1)
@@ -1424,6 +1425,32 @@ document.querySelectorAll("#rc-groups-form .rc-grp-mode").forEach(function(sel){
     /**
      * Lien dans l'espace client (page "Votre compte").
      */
+    /**
+     * SAV > Retours produits : la liste native n'affiche que l'ID de la commande.
+     * On ajoute sa référence, filtrable (la liste joint déjà `orders` sous l'alias o).
+     * Le hook passe deux fois : processFilter() (champs seuls) puis getList() (requête).
+     */
+    public function hookActionAdminReturnListingFieldsModifier($params)
+    {
+        if (isset($params['select']) && strpos((string) $params['select'], 'o.`reference`') === false) {
+            $params['select'] .= ', o.`reference`';
+        }
+        if (isset($params['fields']) && is_array($params['fields']) && !isset($params['fields']['reference'])) {
+            $fields = [];
+            foreach ($params['fields'] as $key => $field) {
+                $fields[$key] = $field;
+                if ($key === 'id_order') {
+                    $fields['reference'] = [
+                        'title' => $this->l('Référence commande'),
+                        'align' => 'center',
+                        'filter_key' => 'o!reference',
+                    ];
+                }
+            }
+            $params['fields'] = $fields;
+        }
+    }
+
     public function hookDisplayCustomerAccount($params)
     {
         $rule = RetractationRules::forContext();

@@ -2,9 +2,14 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
-## [Non publié]
+## [1.6.1] — 2026-09-30
+
+### Sécurité
+- **Correctif de sécurité, mise à jour recommandée.** Le motif saisi par le client était recopié sans être neutralisé dans le retour produit natif, que le back-office affiche tel quel : un client pouvait y placer du code exécuté dans le navigateur de l'employé qui ouvrait le retour. Le motif est désormais enregistré en texte brut (2000 caractères au plus) et neutralisé dans le retour natif ; le script de mise à jour neutralise aussi les motifs des retours déjà créés. Le détail sera publié ultérieurement dans une note de sécurité.
+- **Droits des employés.** Accepter, refuser et marquer remboursée une demande exigent le droit de modification sur l'onglet Rétractations ; télécharger le PDF ou les photos, le droit de consultation. Un profil en lecture seule pouvait jusqu'ici effectuer ces gestes.
 
 ### Ajouté
+- **Référence de commande dans SAV > Retours produits.** La liste native n'affichait que l'identifiant de la commande ; le module ajoute la colonne « Référence commande », filtrable.
 - **Hook d'éligibilité `actionRetractationcommandeEligibility`.** Un autre module peut réclamer une commande dont il traite lui-même la rétractation (par exemple une marketplace, pour les commandes de ses vendeurs) : il reçoit la commande (`order`) et écrit son nom dans `claimed_by`. La commande n'a alors ni bouton ni dépôt ici ; le formulaire invité et le dépôt en ligne renvoient le client vers le vendeur. Constante `RetractationRequest::ELIGIBILITY_HOOK`.
 
 ### Corrigé

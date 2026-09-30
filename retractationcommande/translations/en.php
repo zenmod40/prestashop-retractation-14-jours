@@ -206,3 +206,4 @@ $_MODULE['<{retractationcommande}prestashop>demande_b89e86f1db1f3b8bac43811f0380
 $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed53ede40'] = 'No order matches this information. Check the email address and the reference (both shown on your order confirmation email).';
 $_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'Withdrawal from this order is handled by the seller: use the link in your order confirmation e-mail.';
 $_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'Withdrawal from this order is handled by the seller: use the link in your order confirmation e-mail, or the order page in your account.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_9372b7b10a3cf30e1ff285e910d8bff6'] = 'Order reference';

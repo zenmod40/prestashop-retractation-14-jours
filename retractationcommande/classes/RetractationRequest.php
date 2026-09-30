@@ -74,7 +74,7 @@ class RetractationRequest extends ObjectModel
             'id_order_return' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'],
             'reference' => ['type' => self::TYPE_STRING, 'size' => 16],
             'status' => ['type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 32],
-            'message' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'],
+            'message' => ['type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'], // RC-01 : texte brut
             'refusal_reason' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'],
             'products_snapshot' => ['type' => self::TYPE_STRING],
             'delivery_date' => ['type' => self::TYPE_DATE, 'allow_null' => true],
@@ -605,7 +605,8 @@ class RetractationRequest extends ObjectModel
                 ? 'Rétractation légale (art. L221-18 C. conso)'
                 : 'Retour commercial (règles du groupe client)')
             . ' — demande déposée le ' . date('d/m/Y') . ' via l\'espace client.'
-            . ($this->message ? '<br>Motif du client : ' . $this->message : '');
+            // RC-01 : AdminReturnController affiche question sans échappement.
+            . ($this->message ? '<br>Motif du client : ' . htmlspecialchars((string) $this->message, ENT_QUOTES, 'UTF-8') : '');
         $orderReturn->add();
         $orderReturn->addReturnDetail($orderDetailList, $productQtyList, [], []);
 
