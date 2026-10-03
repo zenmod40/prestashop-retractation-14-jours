@@ -73,9 +73,11 @@ class RetractationWorkflow
             $procedure .= '<p style="margin-top:14px"><strong>' . self::l('Instructions') . ' :</strong><br>' . $instructions . '</p>';
         }
 
-        // Bon de retour PDF joint + consigne d'impression / collage sur le colis.
+        // Bon de retour PDF joint + consigne d'impression / collage sur le colis
+        // (désactivable en configuration : ni pièce jointe ni encadré).
         $attachment = null;
-        if (Validate::isLoadedObject($order) && Validate::isLoadedObject($customer)) {
+        if (Configuration::get('RETRACTATION_RETURN_SLIP')
+            && Validate::isLoadedObject($order) && Validate::isLoadedObject($customer)) {
             $attachment = self::buildReturnSlipAttachment($request, $order, $customer);
             if (!$attachment) {
                 $result['warnings'][] = 'pdf_failed';

@@ -40,7 +40,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.6.1';
+        $this->version = '1.6.2';
         $this->author = 'ZM40';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -78,6 +78,7 @@ class RetractationCommande extends Module
             && Configuration::updateValue('RETRACTATION_ALLOW_PHOTOS', 1)
             && Configuration::updateValue('RETRACTATION_RETURN_ADDRESS', '', true)
             && Configuration::updateValue('RETRACTATION_RETURN_INSTRUCTIONS', '', true)
+            && Configuration::updateValue('RETRACTATION_RETURN_SLIP', 1)
             && $this->installDefaultStateMapping();
     }
 
@@ -104,7 +105,7 @@ class RetractationCommande extends Module
             'RETRACTATION_SHOW_FOOTER_LINK', 'RETRACTATION_FOOTER_TARGET', 'RETRACTATION_DELIVERED_STATES', 'RETRACTATION_SHIPPED_STATES', 'RETRACTATION_BLOCKED_STATES',
             'RETRACTATION_EXCLUDED_CATS', 'RETRACTATION_EXCLUDED_PRODUCTS', 'RETRACTATION_PROCEDURE_TEXT',
             'RETRACTATION_CUSTOM_CSS', 'RETRACTATION_ALLOW_PHOTOS', 'RETRACTATION_RETURN_ADDRESS',
-            'RETRACTATION_RETURN_INSTRUCTIONS', RetractationRules::CONFIG_KEY,
+            'RETRACTATION_RETURN_INSTRUCTIONS', 'RETRACTATION_RETURN_SLIP', RetractationRules::CONFIG_KEY,
         ] as $key) {
             Configuration::deleteByName($key);
         }
@@ -412,6 +413,7 @@ class RetractationCommande extends Module
                 Configuration::updateValue('RETRACTATION_ALLOW_PHOTOS', (int) Tools::getValue('RETRACTATION_ALLOW_PHOTOS'));
                 Configuration::updateValue('RETRACTATION_RETURN_ADDRESS', Tools::getValue('RETRACTATION_RETURN_ADDRESS'), true);
                 Configuration::updateValue('RETRACTATION_RETURN_INSTRUCTIONS', Tools::getValue('RETRACTATION_RETURN_INSTRUCTIONS'), true);
+                Configuration::updateValue('RETRACTATION_RETURN_SLIP', (int) Tools::getValue('RETRACTATION_RETURN_SLIP'));
                 $output .= $this->displayConfirmation($this->l('Configuration enregistrée.'));
             }
         }
@@ -858,6 +860,16 @@ HTML;
                         'desc' => $this->l('Texte envoyé au client lorsque le SAV valide la demande (adresse de retour, consignes, remboursement).'),
                     ],
                     [
+                        'type' => 'switch',
+                        'label' => $this->l('Joindre un bon de retour PDF'),
+                        'name' => 'RETRACTATION_RETURN_SLIP',
+                        'desc' => $this->l('Joint à l\'email d\'acceptation un bon de retour PDF à imprimer et coller sur le colis, avec un encadré qui invite le client à le faire. Désactivé : l\'email part sans pièce jointe ni encadré.'),
+                        'values' => [
+                            ['id' => 'rs_on', 'value' => 1, 'label' => $this->l('Oui')],
+                            ['id' => 'rs_off', 'value' => 0, 'label' => $this->l('Non')],
+                        ],
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Instructions spécifiques (bon de retour + email)'),
                         'name' => 'RETRACTATION_RETURN_INSTRUCTIONS',
@@ -897,6 +909,7 @@ HTML;
             'RETRACTATION_ALLOW_PHOTOS' => Tools::getValue('RETRACTATION_ALLOW_PHOTOS', Configuration::get('RETRACTATION_ALLOW_PHOTOS')),
             'RETRACTATION_RETURN_ADDRESS' => Tools::getValue('RETRACTATION_RETURN_ADDRESS', Configuration::get('RETRACTATION_RETURN_ADDRESS')),
             'RETRACTATION_RETURN_INSTRUCTIONS' => Tools::getValue('RETRACTATION_RETURN_INSTRUCTIONS', Configuration::get('RETRACTATION_RETURN_INSTRUCTIONS')),
+            'RETRACTATION_RETURN_SLIP' => Tools::getValue('RETRACTATION_RETURN_SLIP', Configuration::get('RETRACTATION_RETURN_SLIP')),
         ];
 
         return $helper->generateForm([$form]) . $this->renderCatTreeTweaks();

@@ -2,6 +2,11 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.6.2] — 2026-10-03
+
+### Ajouté
+- **Bon de retour PDF facultatif.** Nouvel interrupteur en configuration, « Joindre un bon de retour PDF ». Désactivé, l'e-mail de validation d'une demande part sans le bon de retour en pièce jointe et sans l'encadré qui invite le client à l'imprimer et à le coller sur le colis ; la procédure, l'adresse de retour et les instructions spécifiques restent dans l'e-mail. Utile aux boutiques qui n'exigent pas de bordereau à réception des colis. L'option est activée par défaut, à l'installation comme à la mise à jour : rien ne change sans action de votre part.
+
 ## [1.6.1] — 2026-09-30
 
 ### Sécurité
