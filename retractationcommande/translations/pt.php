@@ -207,3 +207,8 @@ $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed
 $_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'O direito de livre resolução desta encomenda é exercido junto do vendedor: utilize a ligação no seu e-mail de confirmação da encomenda.';
 $_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'O direito de livre resolução desta encomenda é exercido junto do vendedor: utilize a ligação no seu e-mail de confirmação da encomenda, ou a página da encomenda na sua conta.';
 $_MODULE['<{retractationcommande}prestashop>retractationcommande_9372b7b10a3cf30e1ff285e910d8bff6'] = 'Referência da encomenda';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_c1671b3f4124706d52af0a98ebd32373'] = 'De momento, não há módulos para mostrar.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_f5d3e9de3a9d8e22fcb738a4044e9434'] = 'Atualizações e módulos ZM40';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_2d8cefab327d675cfc07e6221712a58a'] = 'Verificar atualizações e atualizar a lista de módulos ZM40';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_b1cc3220e2becd1ec78cb87ebf597de8'] = 'No máximo uma vez por dia, um pedido anónimo ao zm40.com atualiza a lista e o GitHub indica a versão mais recente. Desativado, a lista continua a ser apresentada tal como está. Nenhum dado da loja é transmitido.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_207883d2fb1c4198a203169806aa151e'] = 'Definições guardadas.';

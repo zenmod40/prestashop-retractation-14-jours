@@ -40,7 +40,7 @@ class RetractationCommande extends Module
     {
         $this->name = 'retractationcommande';
         $this->tab = 'administration';
-        $this->version = '1.6.2';
+        $this->version = '1.6.3';
         $this->author = 'ZM40';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6.0', 'max' => '9.99.99'];
@@ -435,9 +435,14 @@ class RetractationCommande extends Module
             $output .= $this->processGroupsSubmit();
         }
 
+        if (Tools::isSubmit('submitRetractationNet')) {
+            Configuration::updateValue('ZM40_NET_ENABLED', (int) Tools::getValue('ZM40_NET_ENABLED'));
+            $output .= $this->displayConfirmation($this->l('Réglages enregistrés.'));
+        }
+
         // Sauvegarde = bon moment pour rafraîchir le feed ZM40 (UX : un nouveau
         // module publié apparaît dès la prochaine ouverture).
-        if (Tools::isSubmit('submitRetractationConfig') || Tools::isSubmit('submitRetractationMapping') || Tools::isSubmit('submitRetractationGroups')) {
+        if (Tools::isSubmit('submitRetractationConfig') || Tools::isSubmit('submitRetractationMapping') || Tools::isSubmit('submitRetractationGroups') || Tools::isSubmit('submitRetractationNet')) {
             Zm40CommonRc::clearFeedCache();
         }
 
@@ -446,6 +451,8 @@ class RetractationCommande extends Module
             $activeTab = 'rc-tab-mapping';
         } elseif (Tools::isSubmit('submitRetractationGroups')) {
             $activeTab = 'rc-tab-groups';
+        } elseif (Tools::isSubmit('submitRetractationNet')) {
+            $activeTab = 'rc-tab-modules';
         }
 
         return $output
@@ -508,20 +515,51 @@ HTML;
     }
 
     /**
-     * Bloc « L'écosystème ZM40 » — feed des autres modules ZM40 disponibles.
-     * Le CSS .zm40-eco-* est chargé ici pour garantir le layout. Fail-silent :
-     * rien si réseau OFF ou feed vide.
+     * Onglet « Modules ZM40 » : la liste des autres modules ZM40 (servie depuis
+     * le cache quand le réseau est coupé), puis l'interrupteur réseau.
      */
     protected function renderEcosystem()
     {
         $modules = Zm40CommonRc::modulesFeed('retractationcommande');
         if (empty($modules)) {
-            return '';
+            $list = '<div class="panel"><p class="text-muted">' . $this->l('Aucun module à afficher pour le moment.') . '</p></div>';
+        } else {
+            $this->context->smarty->assign(array('zm40_modules' => $modules));
+            $list = '<link rel="stylesheet" href="' . $this->_path . 'views/css/zm40-common.css">'
+                . $this->display(__FILE__, 'views/templates/admin/_partials/zm40_modules.tpl');
         }
-        $this->context->smarty->assign(array('zm40_modules' => $modules));
-        $css = '<link rel="stylesheet" href="' . $this->_path . 'views/css/zm40-common.css">';
 
-        return $css . $this->display(__FILE__, 'views/templates/admin/_partials/zm40_modules.tpl');
+        return $list . $this->renderNetForm();
+    }
+
+    /**
+     * Interrupteur réseau ZM40_NET_ENABLED (partagé par tous les modules ZM40).
+     */
+    protected function renderNetForm()
+    {
+        $helper = new HelperForm();
+        $helper->module = $this;
+        $helper->name_controller = $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
+        $helper->submit_action = 'submitRetractationNet';
+        $helper->fields_value = ['ZM40_NET_ENABLED' => Zm40CommonRc::isNetEnabled() ? 1 : 0];
+
+        return $helper->generateForm([['form' => [
+            'legend' => ['title' => $this->l('Mises à jour et modules ZM40'), 'icon' => 'icon-globe'],
+            'input' => [[
+                'type' => 'switch',
+                'label' => $this->l('Vérifier les mises à jour et actualiser la liste des modules ZM40'),
+                'name' => 'ZM40_NET_ENABLED',
+                'desc' => $this->l('Une fois par jour au plus, une requête anonyme vers zm40.com met la liste à jour et GitHub donne la dernière version. Désactivé, la liste reste affichée telle quelle. Aucune donnée de la boutique n\'est transmise.'),
+                'is_bool' => true,
+                'values' => [
+                    ['id' => 'zm40_net_on', 'value' => 1, 'label' => $this->l('Oui')],
+                    ['id' => 'zm40_net_off', 'value' => 0, 'label' => $this->l('Non')],
+                ],
+            ]],
+            'submit' => ['title' => $this->l('Enregistrer'), 'name' => 'submitRetractationNet'],
+        ]]]);
     }
 
     /**
@@ -691,14 +729,8 @@ HTML;
             ['id' => 'rc-tab-mapping', 'label' => $this->l('Mapping des statuts'), 'icon' => 'icon-sitemap', 'content' => $this->renderMappingTab()],
             ['id' => 'rc-tab-groups', 'label' => $this->l('Règles par groupe'), 'icon' => 'icon-group', 'content' => $this->renderGroupsTab()],
             ['id' => 'rc-tab-cgv', 'label' => $this->l('Clause CGV'), 'icon' => 'icon-file-text', 'content' => $this->renderCgvPanel()],
+            ['id' => 'rc-tab-modules', 'label' => $this->l('Modules ZM40'), 'icon' => 'icon-th-large', 'content' => $this->renderEcosystem()],
         ];
-
-        // Onglet « Modules ZM40 » (écosystème) — ajouté uniquement si le feed
-        // renvoie des modules (fail-silent : pas d'onglet vide si réseau OFF).
-        $ecosystem = $this->renderEcosystem();
-        if ($ecosystem !== '') {
-            $tabs[] = ['id' => 'rc-tab-modules', 'label' => $this->l('Modules ZM40'), 'icon' => 'icon-th-large', 'content' => $ecosystem];
-        }
 
         $nav = '<ul class="nav nav-tabs" id="rc-config-tabs">';
         $panes = '<div class="tab-content" style="padding-top:15px;">';

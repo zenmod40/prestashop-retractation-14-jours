@@ -207,3 +207,8 @@ $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed
 $_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'Der Widerruf dieser Bestellung erfolgt beim Verkäufer: Verwenden Sie den Link in Ihrer Bestellbestätigungs-E-Mail.';
 $_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'Der Widerruf dieser Bestellung erfolgt beim Verkäufer: Verwenden Sie den Link in Ihrer Bestellbestätigungs-E-Mail, oder die Bestellseite in Ihrem Konto.';
 $_MODULE['<{retractationcommande}prestashop>retractationcommande_9372b7b10a3cf30e1ff285e910d8bff6'] = 'Bestellreferenz';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_c1671b3f4124706d52af0a98ebd32373'] = 'Derzeit sind keine Module anzuzeigen.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_f5d3e9de3a9d8e22fcb738a4044e9434'] = 'Updates und ZM40-Module';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_2d8cefab327d675cfc07e6221712a58a'] = 'Nach Updates suchen und die Liste der ZM40-Module aktualisieren';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_b1cc3220e2becd1ec78cb87ebf597de8'] = 'Höchstens einmal am Tag aktualisiert eine anonyme Anfrage an zm40.com die Liste, und GitHub liefert die neueste Version. Ist die Option deaktiviert, bleibt die Liste unverändert angezeigt. Es werden keine Shopdaten übertragen.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_207883d2fb1c4198a203169806aa151e'] = 'Einstellungen gespeichert.';

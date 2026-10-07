@@ -2,6 +2,13 @@
 
 Toutes les évolutions notables du module. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [1.6.3] — 2026-10-07
+
+### Modifié
+
+- **Onglet « Modules ZM40 » toujours présent**, avec la liste des modules puis un interrupteur réseau, qui n'existait pas dans la configuration. Textes traduits dans les huit langues du module.
+- **Interrupteur réseau coupé : la liste des modules reste affichée.** Il arrête seulement sa mise à jour depuis zm40.com ; avant, la liste disparaissait. Composant commun ZM40 1.4, qui n'affiche plus non plus le module dans sa propre liste.
+
 ## [1.6.2] — 2026-10-03
 
 ### Ajouté

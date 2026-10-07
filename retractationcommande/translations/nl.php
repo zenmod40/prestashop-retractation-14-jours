@@ -207,3 +207,8 @@ $_MODULE['<{retractationcommande}prestashop>formulaire_7a0ee4dc09fd4aba4669ea6ed
 $_MODULE['<{retractationcommande}prestashop>demande_0cff2a0a69c7e0f287b0ef205d02cd28'] = 'De herroeping van deze bestelling verloopt via de verkoper: gebruik de link in uw e-mail met de orderbevestiging.';
 $_MODULE['<{retractationcommande}prestashop>formulaire_55b6546646db9603c82a433e07a2662b'] = 'De herroeping van deze bestelling verloopt via de verkoper: gebruik de link in uw e-mail met de orderbevestiging, of de bestelpagina in uw account.';
 $_MODULE['<{retractationcommande}prestashop>retractationcommande_9372b7b10a3cf30e1ff285e910d8bff6'] = 'Bestelreferentie';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_c1671b3f4124706d52af0a98ebd32373'] = 'Er zijn op dit moment geen modules om weer te geven.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_f5d3e9de3a9d8e22fcb738a4044e9434'] = 'Updates en ZM40-modules';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_2d8cefab327d675cfc07e6221712a58a'] = 'Controleren op updates en de lijst met ZM40-modules vernieuwen';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_b1cc3220e2becd1ec78cb87ebf597de8'] = 'Hoogstens één keer per dag werkt een anoniem verzoek naar zm40.com de lijst bij en geeft GitHub de nieuwste versie door. Uitgeschakeld blijft de lijst ongewijzigd zichtbaar. Er worden geen winkelgegevens verzonden.';
+$_MODULE['<{retractationcommande}prestashop>retractationcommande_207883d2fb1c4198a203169806aa151e'] = 'Instellingen opgeslagen.';
